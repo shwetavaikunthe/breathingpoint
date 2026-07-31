@@ -134,7 +134,7 @@ section{ padding:88px 0; }
   padding:14px 0;
 }
 .nav-logo{ display:flex; align-items:center; gap:10px; }
-.nav-logo img{ height:94px; width:160px; }
+.nav-logo img{ height:44px; width:auto; }
 .nav-links{
   display:flex;
   align-items:center;
@@ -585,3 +585,64 @@ section{ padding:88px 0; }
 @media (max-width:720px){
   .gallery-grid{ columns:2 160px; }
 }
+
+/* -------- reviews / testimonials -------- */
+.rating-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:14px;
+  background:var(--paper);
+  border-radius:999px;
+  padding:10px 22px 10px 10px;
+  box-shadow:var(--shadow-card);
+  margin-bottom:36px;
+}
+.rating-badge .g-circle{
+  width:40px; height:40px;
+  border-radius:50%;
+  background:var(--ink);
+  color:var(--paper);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:1.1rem;
+}
+.rating-badge b{ font-family:var(--font-display); font-size:1.15rem; color:var(--ink); }
+.rating-badge .stars{ color:var(--gold); letter-spacing:1px; }
+.rating-badge span.count{ color:var(--ink-soft); font-size:.85rem; }
+
+.review-card{
+  background:var(--paper);
+  border-radius:var(--radius-md);
+  padding:26px;
+  box-shadow:var(--shadow-card);
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.review-card .stars{ color:var(--gold); font-size:.9rem; letter-spacing:2px; }
+.review-card p{ color:var(--ink-soft); font-size:.94rem; margin:0; flex:1; }
+.review-card .reviewer{
+  display:flex; align-items:center; gap:10px;
+  font-size:.86rem; font-weight:700; color:var(--ink);
+}
+.review-avatar{
+  width:34px; height:34px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-display); font-weight:700; font-size:.9rem;
+  color:#fff;
+}
+.review-avatar.c1{ background:var(--rose); }
+.review-avatar.c2{ background:var(--saffron); }
+.review-avatar.c3{ background:var(--teal); }
+.review-avatar.c4{ background:var(--leaf); }
+.review-avatar.c5{ background:var(--violet); }
+.review-avatar.c6{ background:var(--gold); }
+
+/* -------- affiliations -------- */
+.affiliation-strip{
+  display:flex; align-items:center; justify-content:center; gap:44px;
+  flex-wrap:wrap;
+}
+.affiliation-strip img{ max-height:96px; width:auto; }
+.affiliation-strip .tag{ font-size:.86rem; padding:9px 18px; }
