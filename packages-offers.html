@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yoga Packages & Offers | Breathing Point Integrative Therapy</title>
+<meta name="description" content="Current yoga packages, batch timings and special offers at Breathing Point Integrative Therapy, Viman Nagar, Pune — updated monthly.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#16324F;
+    --navy-soft:#284A6B;
+    --gold:#C9A227;
+    --terracotta:#E1663D;
+    --teal:#2F7B6F;
+    --cream:#FAF6EF;
+    --cream-deep:#F1E9D8;
+    --ink:#26313B;
+    --line:#E7DFCC;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Work Sans', sans-serif;
+    color:var(--ink);
+    background:var(--cream);
+    line-height:1.6;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces', serif;
+    color:var(--navy);
+    margin:0 0 .5em;
+  }
+  a{color:inherit;text-decoration:none;}
+  img{max-width:100%;display:block;}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 24px;}
+
+  /* Nav — matches existing site nav structure */
+  header.site-nav{
+    background:#fff;
+    border-bottom:1px solid var(--line);
+    position:sticky;top:0;z-index:20;
+  }
+  .nav-inner{
+    max-width:1100px;margin:0 auto;padding:14px 24px;
+    display:flex;align-items:center;justify-content:space-between;gap:24px;
+  }
+  .nav-inner img{height:40px;}
+  nav.links{display:flex;gap:28px;flex-wrap:wrap;font-weight:500;font-size:.95rem;}
+  nav.links a:hover{color:var(--teal);}
+  .btn{
+    display:inline-block;background:var(--navy);color:#fff;
+    padding:10px 22px;border-radius:999px;font-weight:600;font-size:.9rem;
+    letter-spacing:.02em;
+  }
+  .btn:hover{background:var(--teal);}
+  .btn.outline{background:transparent;border:1.5px solid var(--navy);color:var(--navy);}
+  .btn.outline:hover{background:var(--navy);color:#fff;}
+  .btn.gold{background:var(--terracotta);}
+  .btn.gold:hover{background:var(--gold);}
+
+  /* Hero */
+  .hero{
+    background:linear-gradient(180deg,var(--cream-deep),var(--cream));
+    padding:56px 0 40px;text-align:center;
+    border-bottom:1px solid var(--line);
+  }
+  .eyebrow{
+    text-transform:uppercase;letter-spacing:.14em;font-size:.78rem;
+    color:var(--teal);font-weight:600;margin-bottom:10px;
+  }
+  .hero h1{font-size:clamp(2rem,4vw,2.8rem);max-width:720px;margin:0 auto .5em;}
+  .hero p{max-width:600px;margin:0 auto;color:#4A5560;}
+  .updated-badge{
+    display:inline-block;margin-top:18px;background:#fff;border:1px solid var(--line);
+    padding:6px 16px;border-radius:999px;font-size:.82rem;color:var(--navy-soft);font-weight:600;
+  }
+
+  section{padding:56px 0;}
+  section.alt{background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .section-head{max-width:640px;margin:0 auto 36px;text-align:center;}
+  .section-head .eyebrow{margin-bottom:8px;}
+  .section-head h2{font-size:clamp(1.5rem,3vw,2rem);}
+
+  /* Anniversary offer */
+  .offer-card{
+    display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:center;
+    background:linear-gradient(135deg,#FFF7E9,#FDEFE0);
+    border:1px solid var(--line);border-radius:20px;overflow:hidden;
+  }
+  .offer-card img{width:100%;height:100%;object-fit:cover;max-height:520px;}
+  .offer-copy{padding:36px;}
+  .offer-copy .tag{
+    display:inline-block;background:var(--terracotta);color:#fff;font-size:.75rem;
+    font-weight:700;padding:5px 12px;border-radius:999px;letter-spacing:.05em;margin-bottom:14px;
+  }
+  .offer-copy h3{font-size:1.6rem;margin-bottom:.4em;}
+  .price-row{
+    display:flex;align-items:baseline;gap:10px;margin:18px 0;
+  }
+  .price-row .price{font-family:'Fraunces',serif;font-size:2.2rem;color:var(--terracotta);font-weight:700;}
+  .price-row .per{color:#6B7480;font-size:.95rem;}
+  ul.plain{list-style:none;padding:0;margin:0 0 20px;}
+  ul.plain li{
+    padding:6px 0 6px 26px;position:relative;color:#3E4750;font-size:.95rem;
+  }
+  ul.plain li::before{
+    content:"✓";position:absolute;left:0;color:var(--teal);font-weight:700;
+  }
+  .timings{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px;}
+  .timings span{
+    background:#fff;border:1px solid var(--line);border-radius:8px;
+    padding:6px 12px;font-size:.85rem;font-weight:600;color:var(--navy-soft);
+  }
+
+  /* Daily fitness / women's batch */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:center;}
+  .split.reverse{grid-template-columns:1fr 1fr;}
+  .split.reverse .img-col{order:2;}
+  .split img{border-radius:16px;border:1px solid var(--line);}
+  .card-panel{
+    background:#fff;border:1px solid var(--line);border-radius:16px;padding:28px;
+  }
+  .concern-list{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0 20px;}
+  .concern-list span{
+    background:var(--cream-deep);border-radius:999px;padding:6px 14px;font-size:.85rem;font-weight:600;color:var(--navy);
+  }
+
+  /* Package grid (Kids Yoga / Yoga with Props — monthly refresh) */
+  .pkg-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;
+  }
+  .pkg-card{
+    background:#fff;border:1px solid var(--line);border-radius:16px;padding:26px;
+  }
+  .pkg-card h3{font-size:1.15rem;margin-bottom:.35em;}
+  .pkg-card .status{
+    display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.05em;
+    text-transform:uppercase;color:var(--teal);background:#EAF4F1;border-radius:999px;
+    padding:4px 10px;margin-bottom:12px;
+  }
+  .pkg-card p{color:#5B6570;font-size:.92rem;margin-bottom:0;}
+
+  /* CTA */
+  .cta{
+    text-align:center;background:var(--navy);color:#fff;border-radius:20px;
+    padding:48px 32px;
+  }
+  .cta h2{color:#fff;}
+  .cta p{color:#C8D2DC;max-width:520px;margin:0 auto 22px;}
+
+  footer{background:var(--navy);color:#CBD5DF;padding:44px 0 20px;font-size:.9rem;}
+  footer .foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:32px;margin-bottom:28px;}
+  footer h4{color:#fff;font-size:.95rem;margin-bottom:12px;}
+  footer ul{list-style:none;padding:0;margin:0;}
+  footer li{margin-bottom:8px;}
+  footer a:hover{color:#fff;}
+  .foot-bottom{border-top:1px solid rgba(255,255,255,.12);padding-top:18px;text-align:center;font-size:.82rem;color:#9FADB9;}
+
+  @media (max-width:820px){
+    .offer-card,.split,footer .foot-grid{grid-template-columns:1fr;}
+    .split.reverse .img-col{order:0;}
+    nav.links{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<header class="site-nav">
+  <div class="nav-inner">
+    <a href="index.html"><img src="assets/img/logo-horizontal.png" alt="Breathing Point Integrative Therapy"></a>
+    <nav class="links">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="programs.html">Services</a>
+      <a href="packages-offers.html">Packages & Offers</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="yttc.html">Teacher Training</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <a class="btn" href="contact.html">Book a Session</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Packages & Offers</div>
+    <h1>Yoga Packages & Offers</h1>
+    <p>Batch timings, current offers and package pricing for our Daily Yoga, Kids Yoga and Yoga-with-Props programs — refreshed every month.</p>
+    <span class="updated-badge">Updated for August 2026</span>
+  </div>
+</section>
+
+<!-- 10th Anniversary Offer -->
+<section id="anniversary">
+  <div class="wrap">
+    <div class="offer-card">
+      <img src="assets/img/offers/anniversary-10th-offer.jpg" alt="Breathing Point 10th Anniversary Special Offer">
+      <div class="offer-copy">
+        <span class="tag">🎉 10th Anniversary Special</span>
+        <h3>Celebrate a decade of wellness with us</h3>
+        <p>Namaste 🙏 — join our brand-new Beginner's Daily Yoga Batch, online & offline, at a special anniversary price.</p>
+        <div class="price-row">
+          <span class="price">₹2,040</span>
+          <span class="per">/ month · new beginner's batch</span>
+        </div>
+        <ul class="plain">
+          <li>Monday to Friday, Online & Offline</li>
+          <li>Ashtanga · Hatha · Power Yoga · Pranayam & more</li>
+          <li>Viman Nagar, Pune studio + live online option</li>
+        </ul>
+        <div class="timings">
+          <span>6:00 AM</span><span>7:00 AM</span><span>8:00 AM</span>
+          <span>5:00 PM</span><span>6:00 PM</span><span>7:00 PM</span>
+        </div>
+        <a class="btn gold" href="contact.html">Book Now</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Daily Fitness Yoga Session -->
+<section class="alt" id="daily-fitness">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Daily Batch</div>
+      <h2>Daily Fitness Yoga Session</h2>
+    </div>
+    <div class="split">
+      <div class="img-col">
+        <img src="assets/img/offers/daily-fitness-yoga-session.jpg" alt="Daily Fitness Yoga Session — Women's Special Batch">
+      </div>
+      <div class="card-panel">
+        <h3>Women's Special Yoga Batch</h3>
+        <p>Embrace true freedom through yoga — a dedicated batch for women navigating sleep problems, extreme tiredness, weight gain, memory issues and anxiety.</p>
+        <div class="concern-list">
+          <span>Sleep Problems</span>
+          <span>Extreme Tiredness</span>
+          <span>Weight Gain</span>
+          <span>Memory Issues</span>
+          <span>Anxiety</span>
+        </div>
+        <ul class="plain">
+          <li>Age group: 45–60 years</li>
+          <li>Monday to Friday</li>
+          <li>Breathing Point, Viman Nagar, Pune</li>
+        </ul>
+        <a class="btn outline" href="tel:+919511797416">Call 95117 97416</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Kids Yoga & Yoga with Props — monthly refresh placeholders -->
+<section id="monthly-packages">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">This Month</div>
+      <h2>Kids Yoga & Yoga With Props Packages</h2>
+      <p style="color:#5B6570;">Package details below are updated monthly — check back or ask us for the current sheet.</p>
+    </div>
+    <div class="pkg-grid">
+      <div class="pkg-card">
+        <span class="status">Kids Yoga · Ages 5–11</span>
+        <h3>Kids Yoga Batch</h3>
+        <p>Building focus, confidence and healthy movement habits early, in a fun and safe group setting. Timings and monthly package pricing to be added here.</p>
+      </div>
+      <div class="pkg-card">
+        <span class="status">Yoga With Props</span>
+        <h3>Prop-Based Therapeutic Yoga</h3>
+        <p>Wall ropes, chairs, bolsters, wheels and inversion tools — used to make every posture accessible and safe. Session and package pricing to be added here.</p>
+      </div>
+      <div class="pkg-card">
+        <span class="status">Daily Batch</span>
+        <h3>Beginner's Daily Yoga</h3>
+        <p>Our anniversary-priced beginner's batch, ₹2,040/month — see full details above. Standard pricing resumes after the offer period.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <div class="cta">
+      <h2>Not sure which package fits you?</h2>
+      <p>Tell us your goals, timing preference and whether you'd like online or offline — we'll point you to the right batch.</p>
+      <a class="btn gold" href="contact.html">Talk to Us</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <img src="assets/img/logo-horizontal.png" alt="Breathing Point" style="height:34px;filter:brightness(0) invert(1);margin-bottom:12px;">
+        <p style="max-width:320px;color:#9FADB9;">Integrating traditional yoga with therapeutic yoga, breathwork and mindful living for lifelong well-being.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="programs.html">Services</a></li>
+          <li><a href="packages-offers.html">Packages & Offers</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="yttc.html">Teacher Training</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Get in Touch</h4>
+        <ul>
+          <li>Viman Nagar, Pune, Maharashtra, India</li>
+          <li><a href="tel:+919823203407">+91 98232 03407</a></li>
+          <li><a href="tel:+919607517375">96075 17375</a></li>
+          <li><a href="tel:+919511797416">95117 97416</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">© 2026 Breathing Point Integrative Therapy. All rights reserved. Yoga Certification Board · Ministry of AYUSH, Govt. of India</div>
+  </div>
+</footer>
+
+</body>
+</html>
