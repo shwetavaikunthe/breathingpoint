@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Institute Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1E2A28;
+    --ink-soft:#5B6B63;
+    --paper:#FAFAF7;
+    --panel:#FFFFFF;
+    --line:#DCD9CE;
+    --brass:#B8863B;
+    --brass-deep:#8F6726;
+    --moss:#3F6152;
+    --moss-deep:#2E4B3F;
+    --rust:#A3432B;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:15px;
+    line-height:1.5;
+  }
+  h1,h2,h3,.serif{
+    font-family:'Source Serif 4', serif;
+    font-weight:600;
+    letter-spacing:0.2px;
+    margin:0;
+  }
+  #app{min-height:100vh;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+  a{color:inherit;}
+  button{font-family:inherit;cursor:pointer;}
+  input,select,textarea{font-family:inherit;font-size:14px;}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    border-bottom:1px solid var(--line);
+    background:var(--panel);
+  }
+  .topbar-inner{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 24px;max-width:1080px;margin:0 auto;
+  }
+  .brand{display:flex;align-items:baseline;gap:10px;}
+  .brand .mark{
+    width:30px;height:30px;border:1.5px solid var(--brass);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Source Serif 4',serif;font-weight:700;color:var(--brass-deep);
+    font-size:15px;flex:none;
+  }
+  .brand-name{font-size:19px;}
+  .brand-tag{font-size:12px;color:var(--ink-soft);}
+  .topbar-actions{display:flex;gap:10px;align-items:center;}
+
+  /* ---------- buttons ---------- */
+  .btn{
+    border-radius:2px;border:1px solid var(--ink);
+    background:var(--ink);color:var(--paper);
+    padding:9px 16px;font-size:13.5px;font-weight:500;
+    transition:opacity .15s;
+  }
+  .btn:hover{opacity:.85;}
+  .btn.secondary{
+    background:transparent;color:var(--ink);border:1px solid var(--line);
+  }
+  .btn.secondary:hover{border-color:var(--ink);}
+  .btn.brass{background:var(--brass-deep);border-color:var(--brass-deep);color:#fff;}
+  .btn.moss{background:var(--moss-deep);border-color:var(--moss-deep);color:#fff;}
+  .btn.rust{background:transparent;border-color:var(--rust);color:var(--rust);}
+  .btn.rust:hover{background:var(--rust);color:#fff;}
+  .btn.small{padding:6px 11px;font-size:12.5px;}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+
+  /* ---------- landing ---------- */
+  .hero{padding:64px 0 40px;}
+  .hero h1{font-size:38px;max-width:600px;}
+  .hero p.lede{color:var(--ink-soft);font-size:16px;max-width:480px;margin-top:14px;}
+  .hero-actions{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;}
+
+  .section-label{
+    display:flex;align-items:center;gap:10px;
+    font-size:12.5px;color:var(--ink-soft);margin-bottom:14px;
+  }
+  .section-label .rule{flex:1;height:1px;background:var(--line);}
+
+  .course-row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:16px 0;border-bottom:1px solid var(--line);
+    gap:16px;
+  }
+  .course-row:last-child{border-bottom:none;}
+  .course-name{font-family:'Source Serif 4',serif;font-size:17px;}
+  .course-desc{color:var(--ink-soft);font-size:13.5px;margin-top:3px;max-width:520px;}
+  .course-dates{font-size:12.5px;color:var(--ink-soft);white-space:nowrap;}
+  .badge{
+    display:inline-block;padding:3px 9px;border-radius:2px;
+    font-size:11px;letter-spacing:.3px;border:1px solid transparent;
+  }
+  .badge.upcoming{background:#EFE6D3;color:var(--brass-deep);border-color:#DFCBA0;}
+  .badge.ongoing{background:#E4ECE7;color:var(--moss-deep);border-color:#C4D8CC;}
+  .badge.completed{background:#F0EEE9;color:var(--ink-soft);border-color:var(--line);}
+
+  .empty{
+    padding:36px 0;color:var(--ink-soft);font-size:14px;text-align:left;
+    border-bottom:1px solid var(--line);
+  }
+
+  /* ---------- panels / forms ---------- */
+  .panel{
+    background:var(--panel);border:1px solid var(--line);
+    padding:26px 28px;margin-bottom:24px;
+  }
+  .panel.accent{border-left:3px solid var(--brass);}
+  .panel h2{font-size:19px;margin-bottom:4px;}
+  .panel .sub{color:var(--ink-soft);font-size:13px;margin-bottom:18px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:12.5px;color:var(--ink-soft);margin-bottom:5px;}
+  .field input,.field select,.field textarea{
+    width:100%;padding:9px 11px;border:1px solid var(--line);
+    background:#fff;color:var(--ink);border-radius:2px;
+  }
+  .field input:focus,.field select:focus,.field textarea:focus{
+    outline:none;border-color:var(--brass);
+  }
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media (max-width:640px){.row2{grid-template-columns:1fr;}}
+  .msg{
+    padding:10px 13px;border-radius:2px;font-size:13.5px;margin-bottom:16px;
+  }
+  .msg.ok{background:#E4ECE7;color:var(--moss-deep);}
+  .msg.err{background:#F3E3DF;color:var(--rust);}
+
+  /* ---------- app shell (logged in) ---------- */
+  .shell{display:flex;max-width:1080px;margin:0 auto;min-height:calc(100vh - 68px);}
+  .nav{
+    width:190px;flex:none;border-right:1px solid var(--line);
+    padding:26px 18px;
+  }
+  .nav .navlabel{font-size:11px;color:var(--ink-soft);margin-bottom:12px;letter-spacing:.3px;}
+  .nav button{
+    display:block;width:100%;text-align:left;background:none;border:none;
+    padding:9px 8px;font-size:13.5px;color:var(--ink-soft);border-radius:2px;
+    margin-bottom:2px;
+  }
+  .nav button:hover{background:#F0EEE9;color:var(--ink);}
+  .nav button.active{background:var(--ink);color:var(--paper);}
+  .main{flex:1;padding:30px 32px;min-width:0;}
+
+  table{width:100%;border-collapse:collapse;}
+  th{
+    text-align:left;font-size:11.5px;color:var(--ink-soft);font-weight:500;
+    padding:8px 10px;border-bottom:1px solid var(--ink);letter-spacing:.2px;
+  }
+  td{padding:11px 10px;border-bottom:1px solid var(--line);font-size:13.5px;vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+
+  .id-chip{
+    font-family:'Source Serif 4',serif;background:#F0EEE9;
+    padding:2px 8px;border-radius:2px;font-size:13px;
+  }
+
+  .certificate{
+    border:2px solid var(--brass);padding:2px;background:#fff;
+  }
+  .certificate-inner{
+    border:1px solid var(--brass);padding:44px 40px;text-align:center;
+  }
+  .certificate-inner .cert-eyebrow{font-size:12px;color:var(--ink-soft);letter-spacing:1px;}
+  .certificate-inner .cert-name{font-family:'Source Serif 4',serif;font-size:30px;margin:14px 0 6px;}
+  .certificate-inner .cert-course{font-size:16px;margin:10px 0;}
+  .certificate-inner .cert-course b{font-family:'Source Serif 4',serif;font-weight:600;}
+  .certificate-inner .cert-meta{font-size:12.5px;color:var(--ink-soft);margin-top:22px;}
+  .certificate-inner .cert-rule{width:70px;height:2px;background:var(--brass);margin:18px auto;}
+
+  @media print{
+    body *{visibility:hidden;}
+    #print-area, #print-area *{visibility:visible;}
+    #print-area{position:absolute;top:0;left:0;width:100%;padding:40px;}
+  }
+
+  .footer-note{color:var(--ink-soft);font-size:12px;padding:30px 0;text-align:center;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ============================= DATA LAYER ============================= */
+const ADMIN_PASSWORD = "admin123";
+
+let state = {
+  view: "landing",
+  role: null,            // 'admin' | 'student' | null
+  currentStudent: null,
+  courses: [],
+  students: [],
+  enrollments: [],
+  results: [],
+  message: null,         // {type:'ok'|'err', text:''}
+  adminTab: "courses",
+  studentTab: "enroll",
+  resultCourseId: null,
+};
+
+async function loadAll(){
+  const keys = ["courses","students","enrollments","results"];
+  for(const k of keys){
+    try{
+      const r = await window.storage.get(k, true);
+      state[k] = r ? JSON.parse(r.value) : [];
+    }catch(e){ state[k] = []; }
+  }
+}
+async function persist(key){
+  try{ await window.storage.set(key, JSON.stringify(state[key]), true); }
+  catch(e){ console.error("storage error", e); }
+}
+
+function flash(type, text){
+  state.message = {type, text};
+  render();
+  setTimeout(()=>{ state.message = null; render(); }, 3200);
+}
+
+function todayStart(){ const d = new Date(); d.setHours(0,0,0,0); return d; }
+function parseDate(s){ const d = new Date(s+"T00:00:00"); return d; }
+function fmtDate(s){
+  const d = parseDate(s);
+  return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+}
+function courseStatus(course){
+  const t = todayStart();
+  const start = parseDate(course.startDate);
+  const end = parseDate(course.endDate);
+  if(start > t) return "upcoming";
+  if(end < t) return "completed";
+  return "ongoing";
+}
+function badge(status){
+  const label = status === "upcoming" ? "Upcoming" : status === "ongoing" ? "Ongoing" : "Completed";
+  return `<span class="badge ${status}">${label}</span>`;
+}
+function courseById(id){ return state.courses.find(c=>c.id===id); }
+function studentById(id){ return state.students.find(s=>s.id===id); }
+function nextId(prefix, list){
+  return prefix + String(list.length + 1).padStart(4,'0');
+}
+
+/* ============================= RENDER ============================= */
+function render(){
+  const app = document.getElementById("app");
+  let html = "";
+  if(state.view === "landing") html = renderLanding();
+  else if(state.view === "adminLogin") html = renderAdminLogin();
+  else if(state.view === "adminDashboard") html = renderAdminShell();
+  else if(state.view === "studentRegister") html = renderStudentRegister();
+  else if(state.view === "studentLogin") html = renderStudentLogin();
+  else if(state.view === "studentDashboard") html = renderStudentShell();
+  app.innerHTML = html;
+  window.scrollTo(0,0);
+}
+
+function topbar(showLogout){
+  return `
+  <div class="topbar"><div class="topbar-inner">
+    <div class="brand" style="cursor:pointer" onclick="goLanding()">
+      <div class="mark">I</div>
+      <div>
+        <div class="brand-name serif">Wayfinder Institute</div>
+        <div class="brand-tag">Course registration &amp; certification portal</div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      ${showLogout ? `<button class="btn secondary small" onclick="logout()">Log out</button>` : ""}
+    </div>
+  </div></div>`;
+}
+
+function msgBlock(){
+  if(!state.message) return "";
+  return `<div class="msg ${state.message.type}">${state.message.text}</div>`;
+}
+
+/* ---------- Landing ---------- */
+function renderLanding(){
+  const upcoming = state.courses.filter(c=>courseStatus(c)==="upcoming")
+    .sort((a,b)=>parseDate(a.startDate)-parseDate(b.startDate));
+  return `
+    ${topbar(false)}
+    <div class="wrap">
+      <div class="hero">
+        <h1>Course registration, results and certificates — one portal.</h1>
+        <p class="lede">Browse upcoming courses, register as a student, enroll once your registration is confirmed, and collect your results and certificates all in one place.</p>
+        <div class="hero-actions">
+          <button class="btn brass" onclick="go('studentRegister')">Register as a new student</button>
+          <button class="btn secondary" onclick="go('studentLogin')">Student login</button>
+          <button class="btn secondary" onclick="go('adminLogin')">Admin login</button>
+        </div>
+      </div>
+
+      <div class="section-label"><span>UPCOMING COURSES</span><span class="rule"></span></div>
+      ${upcoming.length === 0 ? `<div class="empty">No courses have been published yet. Check back soon, or log in as admin to publish the first one.</div>` :
+        upcoming.map(c=>`
+          <div class="course-row">
+            <div>
+              <div class="course-name">${escapeHtml(c.name)}</div>
+              ${c.description ? `<div class="course-desc">${escapeHtml(c.description)}</div>` : ""}
+            </div>
+            <div style="text-align:right">
+              ${badge("upcoming")}
+              <div class="course-dates" style="margin-top:6px;">Starts ${fmtDate(c.startDate)}</div>
+            </div>
+          </div>
+        `).join("")}
+      <div class="footer-note">Wayfinder Institute Portal — prototype build</div>
+    </div>
+  `;
+}
+function goLanding(){ state.view="landing"; state.message=null; render(); }
+function go(view){ state.view = view; state.message=null; render(); }
+
+/* ---------- Admin login ---------- */
+function renderAdminLogin(){
+  return `
+    ${topbar(false)}
+    <div class="wrap" style="max-width:420px;padding-top:56px;">
+      ${msgBlock()}
+      <div class="panel accent">
+        <h2>Admin login</h2>
+        <div class="sub">Publish courses, review enrollments, and manage results.</div>
+        <div class="field"><label>Password</label><input id="adminPass" type="password" placeholder="Enter admin password"></div>
+        <button class="btn brass" style="width:100%" onclick="submitAdminLogin()">Log in</button>
+        <div style="margin-top:14px;"><button class="btn secondary small" onclick="goLanding()">&larr; Back</button></div>
+      </div>
+    </div>
+  `;
+}
+function submitAdminLogin(){
+  const pass = document.getElementById("adminPass").value;
+  if(pass === ADMIN_PASSWORD){
+    state.role = "admin"; state.view = "adminDashboard"; state.adminTab="courses";
+    render();
+  } else {
+    flash("err", "Incorrect password.");
+  }
+}
+
+/* ---------- Admin shell ---------- */
+function renderAdminShell(){
+  return `
+    ${topbar(true)}
+    <div class="shell">
+      <div class="nav">
+        <div class="navlabel">ADMIN</div>
+        ${navBtn("adminTab","courses","Courses")}
+        ${navBtn("adminTab","students","Students")}
+        ${navBtn("adminTab","enrollments","Enrollments")}
+        ${navBtn("adminTab","results","Results &amp; certificates")}
+      </div>
+      <div class="main">
+        ${msgBlock()}
+        ${state.adminTab==="courses" ? renderAdminCourses() : ""}
+        ${state.adminTab==="students" ? renderAdminStudents() : ""}
+        ${state.adminTab==="enrollments" ? renderAdminEnrollments() : ""}
+        ${state.adminTab==="results" ? renderAdminResults() : ""}
+      </div>
+    </div>
+  `;
+}
+function navBtn(stateKey, val, label){
+  const active = state[stateKey]===val ? "active" : "";
+  return `<button class="${active}" onclick="setTab('${stateKey}','${val}')">${label}</button>`;
+}
+function setTab(key,val){ state[key]=val; state.message=null; render(); }
+
+function renderAdminCourses(){
+  const sorted = [...state.courses].sort((a,b)=>parseDate(a.startDate)-parseDate(b.startDate));
+  return `
+    <div class="panel accent">
+      <h2>Publish a new course</h2>
+      <div class="sub">This appears immediately on the public course list once its start date is in the future.</div>
+      <div class="field"><label>Course name</label><input id="cName" placeholder="e.g. Data Analysis Fundamentals"></div>
+      <div class="field"><label>Description</label><textarea id="cDesc" rows="2" placeholder="One or two lines about the course"></textarea></div>
+      <div class="row2">
+        <div class="field"><label>Start date</label><input id="cStart" type="date"></div>
+        <div class="field"><label>End date</label><input id="cEnd" type="date"></div>
+      </div>
+      <button class="btn brass" onclick="addCourse()">Publish course</button>
+    </div>
+
+    <div class="section-label"><span>ALL COURSES (${state.courses.length})</span><span class="rule"></span></div>
+    ${sorted.length===0 ? `<div class="empty">No courses published yet — add one above.</div>` : `
+    <table>
+      <tr><th>Course</th><th>Start</th><th>End</th><th>Status</th><th>Enrolled</th></tr>
+      ${sorted.map(c=>{
+        const count = state.enrollments.filter(e=>e.courseId===c.id).length;
+        return `<tr>
+          <td><div class="serif">${escapeHtml(c.name)}</div></td>
+          <td>${fmtDate(c.startDate)}</td>
+          <td>${fmtDate(c.endDate)}</td>
+          <td>${badge(courseStatus(c))}</td>
+          <td>${count}</td>
+        </tr>`;
+      }).join("")}
+    </table>`}
+  `;
+}
+function addCourse(){
+  const name = document.getElementById("cName").value.trim();
+  const desc = document.getElementById("cDesc").value.trim();
+  const start = document.getElementById("cStart").value;
+  const end = document.getElementById("cEnd").value;
+  if(!name || !start || !end){ flash("err","Course name, start date and end date are required."); return; }
+  if(parseDate(end) < parseDate(start)){ flash("err","End date can't be before the start date."); return; }
+  const course = { id: nextId("CRS", state.courses), name, description:desc, startDate:start, endDate:end };
+  state.courses.push(course);
+  persist("courses");
+  flash("ok", `"${name}" has been published.`);
+}
+
+function renderAdminStudents(){
+  const sorted = [...state.students].sort((a,b)=>b.registeredAt.localeCompare(a.registeredAt));
+  return `
+    <div class="section-label"><span>REGISTERED STUDENTS (${state.students.length})</span><span class="rule"></span></div>
+    ${sorted.length===0 ? `<div class="empty">No students have registered yet.</div>` : `
+    <table>
+      <tr><th>Student ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Registered</th></tr>
+      ${sorted.map(s=>`<tr>
+        <td><span class="id-chip">${s.id}</span></td>
+        <td>${escapeHtml(s.name)}</td>
+        <td>${escapeHtml(s.email)}</td>
+        <td>${escapeHtml(s.phone||"—")}</td>
+        <td>${fmtDate(s.registeredAt.slice(0,10))}</td>
+      </tr>`).join("")}
+    </table>`}
+  `;
+}
+
+function renderAdminEnrollments(){
+  const sorted = [...state.enrollments].sort((a,b)=>b.enrolledAt.localeCompare(a.enrolledAt));
+  return `
+    <div class="section-label"><span>ALL ENROLLMENTS (${state.enrollments.length})</span><span class="rule"></span></div>
+    ${sorted.length===0 ? `<div class="empty">No enrollments yet.</div>` : `
+    <table>
+      <tr><th>Registration ID</th><th>Student</th><th>Course</th><th>Enrolled on</th></tr>
+      ${sorted.map(e=>{
+        const st = studentById(e.studentId), c = courseById(e.courseId);
+        return `<tr>
+          <td><span class="id-chip">${e.id}</span></td>
+          <td>${st?escapeHtml(st.name):"—"}</td>
+          <td>${c?escapeHtml(c.name):"—"}</td>
+          <td>${fmtDate(e.enrolledAt.slice(0,10))}</td>
+        </tr>`;
+      }).join("")}
+    </table>`}
+  `;
+}
+
+function renderAdminResults(){
+  const eligible = state.courses.filter(c=>courseStatus(c)!=="upcoming");
+  const selectedId = state.resultCourseId || (eligible[0] && eligible[0].id) || null;
+  const roster = selectedId ? state.enrollments.filter(e=>e.courseId===selectedId) : [];
+  return `
+    <div class="panel accent">
+      <h2>Update results</h2>
+      <div class="sub">Only courses that have started can have results recorded.</div>
+      <div class="field">
+        <label>Course</label>
+        <select onchange="state.resultCourseId=this.value; render();">
+          ${eligible.length===0 ? `<option value="">No started courses yet</option>` :
+            eligible.map(c=>`<option value="${c.id}" ${c.id===selectedId?"selected":""}>${escapeHtml(c.name)}</option>`).join("")}
+        </select>
+      </div>
+    </div>
+
+    ${!selectedId ? `<div class="empty">Select a course above once it has started to record results.</div>` :
+      roster.length===0 ? `<div class="empty">No students enrolled in this course yet.</div>` : `
+      <table>
+        <tr><th>Student</th><th>Reg. ID</th><th>Score</th><th>Grade</th><th>Result</th><th></th></tr>
+        ${roster.map(e=>{
+          const st = studentById(e.studentId);
+          const existing = state.results.find(r=>r.enrollmentId===e.id);
+          return `<tr>
+            <td>${st?escapeHtml(st.name):"—"}</td>
+            <td><span class="id-chip">${e.id}</span></td>
+            <td><input style="width:70px" id="score-${e.id}" type="number" min="0" max="100" value="${existing?existing.score:''}"></td>
+            <td><input style="width:60px" id="grade-${e.id}" value="${existing?existing.grade:''}" placeholder="A"></td>
+            <td>
+              <select id="pass-${e.id}" style="width:100px">
+                <option value="pass" ${existing&&existing.pass?"selected":""}>Pass</option>
+                <option value="fail" ${existing&&!existing.pass?"selected":""}>Fail</option>
+              </select>
+            </td>
+            <td><button class="btn small ${existing?"secondary":"moss"}" onclick="publishResult('${e.id}')">${existing?"Update":"Publish"}</button></td>
+          </tr>`;
+        }).join("")}
+      </table>`}
+  `;
+}
+function publishResult(enrollmentId){
+  const score = document.getElementById("score-"+enrollmentId).value;
+  const grade = document.getElementById("grade-"+enrollmentId).value.trim();
+  const pass = document.getElementById("pass-"+enrollmentId).value === "pass";
+  if(score === ""){ flash("err","Enter a score before publishing."); return; }
+  let result = state.results.find(r=>r.enrollmentId===enrollmentId);
+  if(result){
+    result.score = score; result.grade = grade; result.pass = pass; result.publishedAt = new Date().toISOString();
+  } else {
+    result = {
+      id: nextId("RES", state.results),
+      enrollmentId, score, grade, pass,
+      certificateId: "CERT-" + enrollmentId,
+      publishedAt: new Date().toISOString()
+    };
+    state.results.push(result);
+  }
+  persist("results");
+  flash("ok","Result published. The student can now view it.");
+}
+
+/* ---------- Student registration ---------- */
+function renderStudentRegister(){
+  return `
+    ${topbar(false)}
+    <div class="wrap" style="max-width:480px;padding-top:48px;">
+      ${msgBlock()}
+      <div class="panel accent">
+        <h2>New student registration</h2>
+        <div class="sub">Once you register, you can log in right away to enroll in a course.</div>
+        <div class="field"><label>Full name</label><input id="rName" placeholder="Your full name"></div>
+        <div class="field"><label>Email</label><input id="rEmail" type="email" placeholder="you@example.com"></div>
+        <div class="field"><label>Phone</label><input id="rPhone" placeholder="Phone number"></div>
+        <div class="field"><label>Set a password</label><input id="rPass" type="password" placeholder="Choose a password"></div>
+        <button class="btn brass" style="width:100%" onclick="submitRegistration()">Register</button>
+        <div style="margin-top:14px;"><button class="btn secondary small" onclick="goLanding()">&larr; Back</button></div>
+      </div>
+    </div>
+  `;
+}
+function submitRegistration(){
+  const name = document.getElementById("rName").value.trim();
+  const email = document.getElementById("rEmail").value.trim().toLowerCase();
+  const phone = document.getElementById("rPhone").value.trim();
+  const pass = document.getElementById("rPass").value;
+  if(!name || !email || !pass){ flash("err","Name, email and password are required."); return; }
+  if(!/^\S+@\S+\.\S+$/.test(email)){ flash("err","Enter a valid email address."); return; }
+  if(state.students.some(s=>s.email===email)){ flash("err","An account with this email already exists — try logging in instead."); return; }
+  const student = { id: nextId("STU", state.students), name, email, phone, password: pass, registeredAt: new Date().toISOString() };
+  state.students.push(student);
+  persist("students");
+  state.currentStudent = student;
+  state.view = "studentDashboard";
+  state.studentTab = "enroll";
+  render();
+  flash("ok", `Registration confirmed. Your Student ID is ${student.id} — you're logged in and ready to enroll.`);
+}
+
+/* ---------- Student login ---------- */
+function renderStudentLogin(){
+  return `
+    ${topbar(false)}
+    <div class="wrap" style="max-width:420px;padding-top:56px;">
+      ${msgBlock()}
+      <div class="panel accent">
+        <h2>Student login</h2>
+        <div class="field"><label>Email</label><input id="lEmail" type="email" placeholder="you@example.com"></div>
+        <div class="field"><label>Password</label><input id="lPass" type="password" placeholder="Your password"></div>
+        <button class="btn brass" style="width:100%" onclick="submitStudentLogin()">Log in</button>
+        <div style="margin-top:14px;display:flex;justify-content:space-between;">
+          <button class="btn secondary small" onclick="goLanding()">&larr; Back</button>
+          <button class="btn secondary small" onclick="go('studentRegister')">New here? Register</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function submitStudentLogin(){
+  const email = document.getElementById("lEmail").value.trim().toLowerCase();
+  const pass = document.getElementById("lPass").value;
+  const student = state.students.find(s=>s.email===email && s.password===pass);
+  if(!student){ flash("err","No matching account found. Check your email and password."); return; }
+  state.currentStudent = student;
+  state.role = "student";
+  state.view = "studentDashboard";
+  state.studentTab = "enroll";
+  render();
+}
+
+/* ---------- Student shell ---------- */
+function renderStudentShell(){
+  const s = state.currentStudent;
+  return `
+    ${topbar(true)}
+    <div class="shell">
+      <div class="nav">
+        <div class="navlabel">${escapeHtml(s.name.toUpperCase())}<br><span style="opacity:.7">${s.id}</span></div>
+        ${navBtn("studentTab","enroll","Enroll in a course")}
+        ${navBtn("studentTab","myEnrollments","My enrollments")}
+        ${navBtn("studentTab","results","Results &amp; certificates")}
+      </div>
+      <div class="main">
+        ${msgBlock()}
+        ${state.studentTab==="enroll" ? renderStudentEnroll() : ""}
+        ${state.studentTab==="myEnrollments" ? renderStudentEnrollments() : ""}
+        ${state.studentTab==="results" ? renderStudentResults() : ""}
+      </div>
+    </div>
+  `;
+}
+
+function renderStudentEnroll(){
+  const s = state.currentStudent;
+  const myCourseIds = new Set(state.enrollments.filter(e=>e.studentId===s.id).map(e=>e.courseId));
+  const available = state.courses.filter(c=>courseStatus(c)==="upcoming" && !myCourseIds.has(c.id))
+    .sort((a,b)=>parseDate(a.startDate)-parseDate(b.startDate));
+  return `
+    <div class="panel accent">
+      <h2>Enroll in a course</h2>
+      <div class="sub">Only courses that haven't started yet are shown here.</div>
+      ${available.length===0 ? `<div class="empty" style="border:none;padding:10px 0;">No upcoming courses available to enroll in right now — check back soon.</div>` : `
+        <div class="field">
+          <label>Choose a course</label>
+          <select id="enrollCourse">
+            ${available.map(c=>`<option value="${c.id}">${escapeHtml(c.name)} — starts ${fmtDate(c.startDate)}</option>`).join("")}
+          </select>
+        </div>
+        <button class="btn moss" onclick="enrollInCourse()">Enroll</button>
+      `}
+    </div>
+  `;
+}
+function enrollInCourse(){
+  const sel = document.getElementById("enrollCourse");
+  if(!sel) return;
+  const courseId = sel.value;
+  const s = state.currentStudent;
+  const enrollment = { id: nextId("REG", state.enrollments), studentId: s.id, courseId, enrolledAt: new Date().toISOString() };
+  state.enrollments.push(enrollment);
+  persist("enrollments");
+  state.studentTab = "myEnrollments";
+  render();
+  flash("ok", `You're enrolled. Your Registration ID is ${enrollment.id}.`);
+}
+
+function renderStudentEnrollments(){
+  const s = state.currentStudent;
+  const mine = state.enrollments.filter(e=>e.studentId===s.id).sort((a,b)=>b.enrolledAt.localeCompare(a.enrolledAt));
+  return `
+    <div class="section-label"><span>MY ENROLLMENTS (${mine.length})</span><span class="rule"></span></div>
+    ${mine.length===0 ? `<div class="empty">You haven't enrolled in any course yet.</div>` : `
+    <table>
+      <tr><th>Registration ID</th><th>Course</th><th>Dates</th><th>Status</th></tr>
+      ${mine.map(e=>{
+        const c = courseById(e.courseId);
+        return `<tr>
+          <td><span class="id-chip">${e.id}</span></td>
+          <td>${c?escapeHtml(c.name):"—"}</td>
+          <td>${c?`${fmtDate(c.startDate)} – ${fmtDate(c.endDate)}`:"—"}</td>
+          <td>${c?badge(courseStatus(c)):"—"}</td>
+        </tr>`;
+      }).join("")}
+    </table>`}
+  `;
+}
+
+function renderStudentResults(){
+  const s = state.currentStudent;
+  const mine = state.enrollments.filter(e=>e.studentId===s.id);
+  const withResults = mine.map(e=>({e, r: state.results.find(r=>r.enrollmentId===e.id)})).filter(x=>x.r);
+  return `
+    <div class="section-label"><span>RESULTS &amp; CERTIFICATES</span><span class="rule"></span></div>
+    ${withResults.length===0 ? `<div class="empty">No results have been published for you yet.</div>` : `
+    <table>
+      <tr><th>Course</th><th>Score</th><th>Grade</th><th>Result</th><th></th></tr>
+      ${withResults.map(({e,r})=>{
+        const c = courseById(e.courseId);
+        return `<tr>
+          <td>${c?escapeHtml(c.name):"—"}</td>
+          <td>${r.score}</td>
+          <td>${r.grade||"—"}</td>
+          <td>${r.pass ? `<span class="badge ongoing">Pass</span>` : `<span class="badge completed">Fail</span>`}</td>
+          <td>${r.pass ? `<button class="btn small brass" onclick="viewCertificate('${e.id}')">View certificate</button>` : ""}</td>
+        </tr>`;
+      }).join("")}
+    </table>`}
+    <div id="certModal"></div>
+  `;
+}
+function viewCertificate(enrollmentId){
+  const e = state.enrollments.find(x=>x.id===enrollmentId);
+  const r = state.results.find(x=>x.enrollmentId===enrollmentId);
+  const c = courseById(e.courseId);
+  const s = state.currentStudent;
+  document.getElementById("certModal").innerHTML = `
+    <div style="position:fixed;inset:0;background:rgba(30,42,40,.55);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px;" onclick="if(event.target===this) closeCertificate();">
+      <div style="max-width:640px;width:100%;">
+        <div id="print-area" class="certificate">
+          <div class="certificate-inner">
+            <div class="cert-eyebrow">WAYFINDER INSTITUTE — CERTIFICATE OF COMPLETION</div>
+            <div class="cert-rule"></div>
+            <div class="cert-name">${escapeHtml(s.name)}</div>
+            <div class="cert-course">has successfully completed<br><b>${c?escapeHtml(c.name):""}</b></div>
+            <div class="cert-rule"></div>
+            <div class="cert-meta">
+              Grade: ${r.grade||"—"} &nbsp;·&nbsp; Score: ${r.score} &nbsp;·&nbsp; Certificate ID: ${r.certificateId}<br>
+              Issued ${fmtDate(r.publishedAt.slice(0,10))}
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:center;gap:10px;margin-top:16px;">
+          <button class="btn moss" onclick="window.print()">Print / save as PDF</button>
+          <button class="btn secondary" onclick="closeCertificate()">Close</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function closeCertificate(){ document.getElementById("certModal").innerHTML = ""; }
+
+/* ---------- shared ---------- */
+function logout(){
+  state.role = null; state.currentStudent = null; state.view = "landing"; state.message = null;
+  render();
+}
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+}
+
+/* ============================= INIT ============================= */
+(async function init(){
+  document.getElementById("app").innerHTML = `<div class="wrap" style="padding-top:80px;color:#5B6B63;">Loading…</div>`;
+  await loadAll();
+  render();
+})();
+</script>
+</body>
+</html>
