@@ -73,6 +73,9 @@
   .badge.upcoming{background:#F1E4CC;color:var(--gold-deep);border-color:#E1C793;}
   .badge.ongoing{background:#E6ECDD;color:var(--green-deep);border-color:#CBDAB6;}
   .badge.completed{background:#F0EEE4;color:var(--ink-soft);border-color:var(--line);}
+  .badge.inreview{background:#F1E4CC;color:var(--gold-deep);border-color:#E1C793;}
+  .badge.pendingstatus{background:#F3E3DF;color:var(--rust);border-color:#E3BEB3;}
+  .badge.activestatus{background:#E6ECDD;color:var(--green-deep);border-color:#CBDAB6;}
 
   .empty{padding:36px 0;color:var(--ink-soft);font-size:14px;text-align:left;border-bottom:1px solid var(--line);}
 
@@ -156,6 +159,7 @@ const ADMIN_PASSWORD = "admin123";
 const CATALOG_PAGE_SIZE = 6;
 const ADMIN_COURSE_PAGE_SIZE = 8;
 const SUPPORT_PHONE = "+91 98232 03407";
+const NOTIFY_FROM_EMAIL = "breathingpointstudio@gmail.com";
 const SUPPORT_NOTE = "Password resets are handled by the institute admin only — there is no self-service reset. Please contact us at " + SUPPORT_PHONE + " or via breathingpoint.in/contact.html with your registered email, and we'll reset it for you.";
 
 let state = {
@@ -250,7 +254,9 @@ async function sendEmail(toEmail, toName, subject, message){
   if(!emailReady()) return false;
   try{
     if(!window.__emailjsInit){ emailjs.init({ publicKey: state.settings.publicKey }); window.__emailjsInit = true; }
-    await emailjs.send(state.settings.serviceId, state.settings.templateId, { to_email: toEmail, to_name: toName, subject, message });
+    await emailjs.send(state.settings.serviceId, state.settings.templateId, {
+      to_email: toEmail, to_name: toName, subject, message, from_email: NOTIFY_FROM_EMAIL
+    });
     return true;
   }catch(e){ console.error("email send failed", e); return false; }
 }
@@ -270,8 +276,8 @@ function exportToExcel(){
     const st = studentById(e.studentId), c = courseById(e.courseId);
     return {
       "Registration ID": e.id, "Student ID": e.studentId, "Student Name": st?st.name:"",
-      "Course": c?c.name:"", "Fee": e.fee, "Payment Status": e.paymentStatus, "Amount Paid": e.amountPaid,
-      "Enrolled On": e.enrolledAt,
+      "Course": c?c.name:"", "Fee": e.fee, "Enrollment Status": e.status,
+      "Status Updated": e.statusUpdatedAt||"", "Enrolled On": e.enrolledAt,
     };
   });
   const resultRows = state.results.map(r=>{
@@ -453,7 +459,8 @@ function renderAdminShell(){
         <div class="navlabel">ADMIN</div>
         ${navBtn("adminTab","courses","Courses")}
         ${navBtn("adminTab","students","Registrations")}
-        ${navBtn("adminTab","enrollments","Enrollments &amp; payments")}
+        ${navBtn("adminTab","enrollments","Enrollments &amp; status")}
+        ${navBtn("adminTab","reports","Reports")}
         ${navBtn("adminTab","results","Results &amp; certificates")}
         ${navBtn("adminTab","settings","Email settings")}
         ${navBtn("adminTab","export","Export data")}
@@ -463,6 +470,7 @@ function renderAdminShell(){
         ${state.adminTab==="courses" ? renderAdminCourses() : ""}
         ${state.adminTab==="students" ? renderAdminStudents() : ""}
         ${state.adminTab==="enrollments" ? renderAdminEnrollments() : ""}
+        ${state.adminTab==="reports" ? renderAdminReports() : ""}
         ${state.adminTab==="results" ? renderAdminResults() : ""}
         ${state.adminTab==="settings" ? renderAdminSettings() : ""}
         ${state.adminTab==="export" ? renderAdminExport() : ""}
@@ -511,7 +519,7 @@ function renderAdminCourses(){
     <div class="field" style="max-width:320px;"><input placeholder="Search by name or category" value="${escapeHtml(state.adminCourseSearch)}" oninput="onAdminCourseSearch(this.value)"></div>
     ${pageItems.length===0 ? `<div class="empty">No courses match this search.</div>` : `
     <table>
-      <tr><th>Course</th><th>Category</th><th>Fee</th><th>Start</th><th>End</th><th>Status</th><th>Enrolled</th></tr>
+      <tr><th>Course</th><th>Category</th><th>Fee</th><th>Start</th><th>End</th><th>Status</th><th>Enrolled</th><th></th></tr>
       ${pageItems.map(c=>{
         const count = state.enrollments.filter(e=>e.courseId===c.id).length;
         return `<tr>
@@ -522,6 +530,7 @@ function renderAdminCourses(){
           <td>${fmtDate(c.endDate)}</td>
           <td>${badge(courseStatus(c))}</td>
           <td>${count}</td>
+          <td><button class="btn small secondary" onclick="openEditCourse('${c.id}')">Edit</button></td>
         </tr>`;
       }).join("")}
     </table>
@@ -547,6 +556,51 @@ function addCourse(){
   state.courses.push(course);
   persist("courses");
   flash("ok", `"${name}" has been published.`);
+}
+
+function openEditCourse(courseId){
+  const c = courseById(courseId);
+  if(!c) return;
+  openModal(`
+    <div class="modal-backdrop" onclick="if(event.target===this) closeModal();">
+      <div class="modal-box" style="max-width:520px;">
+        <h2 style="font-size:19px;">Edit course</h2>
+        <div class="sub">${c.id} — changes apply immediately, including to the public catalog.</div>
+        <div id="editCourseMsg"></div>
+        <div class="field"><label>Course name</label><input id="ecName" value="${escapeHtml(c.name)}"></div>
+        <div class="field"><label>Description</label><textarea id="ecDesc" rows="2">${escapeHtml(c.description||"")}</textarea></div>
+        <div class="row2">
+          <div class="field"><label>Start date</label><input id="ecStart" type="date" value="${c.startDate}"></div>
+          <div class="field"><label>End date</label><input id="ecEnd" type="date" value="${c.endDate}"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Category</label><input id="ecCategory" value="${escapeHtml(c.category||"")}"></div>
+          <div class="field"><label>Fee (₹)</label><input id="ecFee" type="number" min="0" value="${c.fee||0}"></div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn green" onclick="saveCourseEdit('${c.id}')">Save changes</button>
+          <button class="btn secondary" onclick="closeModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  `);
+}
+function saveCourseEdit(courseId){
+  const c = courseById(courseId);
+  if(!c) return;
+  const name = document.getElementById("ecName").value.trim();
+  const desc = document.getElementById("ecDesc").value.trim();
+  const start = document.getElementById("ecStart").value;
+  const end = document.getElementById("ecEnd").value;
+  const category = document.getElementById("ecCategory").value.trim();
+  const fee = Number(document.getElementById("ecFee").value) || 0;
+  if(!name || !start || !end){ localError("editCourseMsg","Course name, start date and end date are required."); return; }
+  if(parseDate(end) < parseDate(start)){ localError("editCourseMsg","End date can't be before the start date."); return; }
+  if(fee < 0){ localError("editCourseMsg","Fee can't be negative."); return; }
+  c.name = name; c.description = desc; c.startDate = start; c.endDate = end; c.category = category; c.fee = fee;
+  persist("courses");
+  closeModal();
+  flash("ok", `"${name}" has been updated.`);
 }
 
 function renderAdminStudents(){
@@ -626,38 +680,80 @@ function confirmResetPassword(studentId){
   flash("ok", `Password reset for ${st.name}. Share the new password with them directly.`);
 }
 
+function admissionBadge(status){
+  if(status === "Active") return `<span class="badge activestatus">Active</span>`;
+  if(status === "Pending") return `<span class="badge pendingstatus">Pending</span>`;
+  return `<span class="badge inreview">In Review</span>`;
+}
 function renderAdminEnrollments(){
   const sorted = [...state.enrollments].sort((a,b)=>b.enrolledAt.localeCompare(a.enrolledAt));
   return `
     <div class="section-label"><span>ALL ENROLLMENTS (${state.enrollments.length})</span><span class="rule"></span></div>
     ${sorted.length===0 ? `<div class="empty">No enrollments yet.</div>` : `
     <table>
-      <tr><th>Registration ID</th><th>Student</th><th>Course</th><th>Fee</th><th>Payment</th><th>Enrolled on</th><th></th></tr>
+      <tr><th>Registration ID</th><th>Student</th><th>Course</th><th>Fee</th><th>Status</th><th>Enrolled on</th><th></th></tr>
       ${sorted.map(e=>{
         const st = studentById(e.studentId), c = courseById(e.courseId);
-        const payBadge = e.paymentStatus==="paid" ? `<span class="badge ongoing">Paid</span>`
-          : e.paymentStatus==="pending" ? `<span class="badge upcoming">Pending</span>`
-          : `<span class="badge completed">Free</span>`;
         return `<tr>
           <td><span class="id-chip">${e.id}</span></td>
           <td>${st?escapeHtml(st.name):"—"}</td>
           <td>${c?escapeHtml(c.name):"—"}</td>
           <td>${fmtMoney(e.fee)}</td>
-          <td>${payBadge}</td>
+          <td>${admissionBadge(e.status)}</td>
           <td>${fmtDate(e.enrolledAt.slice(0,10))}</td>
-          <td>${e.paymentStatus==="pending" ? `<button class="btn small secondary" onclick="markPaid('${e.id}')">Mark paid</button>` : ""}</td>
+          <td style="white-space:nowrap;">
+            ${e.status!=="Active" ? `<button class="btn small green" onclick="setEnrollmentStatus('${e.id}','Active')">Mark Active</button>` : ""}
+            ${e.status!=="Pending" ? `<button class="btn small secondary" onclick="setEnrollmentStatus('${e.id}','Pending')">Mark Pending</button>` : ""}
+          </td>
         </tr>`;
       }).join("")}
     </table>`}
-    <div style="margin-top:12px;font-size:12px;color:var(--ink-soft);">"Mark paid" is for recording offline payments (cash, bank transfer). No live payment gateway is connected in this prototype.</div>
+    <div style="margin-top:12px;font-size:12px;color:var(--ink-soft);">Check payment (bank transfer / UPI / cash) outside the portal, then set the status here — the student is emailed automatically when you do.</div>
   `;
 }
-function markPaid(enrollmentId){
+function setEnrollmentStatus(enrollmentId, newStatus){
   const e = state.enrollments.find(x=>x.id===enrollmentId);
   if(!e) return;
-  e.paymentStatus = "paid"; e.amountPaid = e.fee;
+  e.status = newStatus;
+  e.statusUpdatedAt = new Date().toISOString();
   persist("enrollments");
-  flash("ok","Marked as paid.");
+  flash("ok", `Status updated to ${newStatus}.`);
+  const st = studentById(e.studentId), c = courseById(e.courseId);
+  if(!st || !c) return;
+  if(newStatus === "Active"){
+    sendEmail(st.email, st.name, "Your enrollment is now Active",
+      `Good news, ${st.name} — your enrollment for ${c.name} (Registration ID ${e.id}) is now Active. We look forward to having you in the course.`).catch(()=>{});
+  } else if(newStatus === "Pending"){
+    sendEmail(st.email, st.name, "Payment confirmation pending",
+      `Hi ${st.name}, we've received your registration for ${c.name} (Registration ID ${e.id}), but payment confirmation is still pending. Please complete your payment so we can activate your enrollment.`).catch(()=>{});
+  }
+}
+
+function renderAdminReports(){
+  const rows = state.courses.map(c=>{
+    const enrs = state.enrollments.filter(e=>e.courseId===c.id);
+    return {
+      c, total: enrs.length,
+      inReview: enrs.filter(e=>e.status==="In Review").length,
+      pending: enrs.filter(e=>e.status==="Pending").length,
+      active: enrs.filter(e=>e.status==="Active").length,
+    };
+  }).sort((a,b)=> b.total - a.total || parseDate(a.c.startDate)-parseDate(b.c.startDate));
+  return `
+    <div class="section-label"><span>APPLICATIONS BY COURSE</span><span class="rule"></span></div>
+    ${rows.length===0 ? `<div class="empty">No courses published yet.</div>` : `
+    <table>
+      <tr><th>Course</th><th>Course status</th><th>Total applied</th><th>In Review</th><th>Pending</th><th>Active</th></tr>
+      ${rows.map(r=>`<tr>
+        <td><div class="serif" style="font-size:15px;">${escapeHtml(r.c.name)}</div></td>
+        <td>${badge(courseStatus(r.c))}</td>
+        <td>${r.total}</td>
+        <td>${r.inReview}</td>
+        <td>${r.pending}</td>
+        <td>${r.active}</td>
+      </tr>`).join("")}
+    </table>`}
+  `;
 }
 
 function renderAdminResults(){
@@ -880,7 +976,7 @@ function renderAdminExport(){
       <h2>Export data to Excel</h2>
       <div class="sub">
         This portal's live data is stored securely behind the scenes. Use this button any time to download a full, current snapshot
-        as an Excel workbook — one sheet each for Registrations, Enrollments &amp; Payments, and Results — to keep as your records backup
+        as an Excel workbook — one sheet each for Registrations, Enrollments &amp; Status, and Results — to keep as your records backup
         or import elsewhere.
       </div>
       <button class="btn gold" onclick="exportToExcel()">Download Excel workbook</button>
@@ -912,7 +1008,8 @@ function renderStudentRegister(){
               <label>Gender</label>
               <div class="radio-row">
                 <label><input type="radio" name="rGender" value="Male"> Male</label>
-                <label><input type="radio" name="rGender" value="Female"> Female</label>                
+                <label><input type="radio" name="rGender" value="Female"> Female</label>
+                <label><input type="radio" name="rGender" value="Other"> Other</label>
               </div>
             </div>
           </div>
@@ -1153,17 +1250,15 @@ function enrollInCourse(){
   const enrollment = {
     id: nextId("REG", state.enrollments), studentId: s.id, courseId,
     enrolledAt: new Date().toISOString(),
-    fee, paymentStatus: fee > 0 ? "pending" : "free", amountPaid: 0
+    fee, status: "In Review", statusUpdatedAt: null
   };
   state.enrollments.push(enrollment);
   persist("enrollments");
   state.studentTab = "myEnrollments";
   render();
-  flash("ok", fee > 0
-    ? `You're enrolled. Registration ID: ${enrollment.id}. Fee ${fmtMoney(fee)} is pending — pay from My Enrollments.`
-    : `You're enrolled. Your Registration ID is ${enrollment.id}.`);
-  sendEmail(s.email, s.name, "Course enrollment confirmed",
-    `You're enrolled in ${course.name}. Your Registration ID is ${enrollment.id}.${fee>0?` Fee: ${fmtMoney(fee)} (pending).`:''}`).catch(()=>{});
+  flash("ok", `You're enrolled. Registration ID: ${enrollment.id}. Your status is In Review — we'll confirm it shortly.`);
+  sendEmail(s.email, s.name, "Course enrollment received",
+    `You're enrolled in ${course.name}. Your Registration ID is ${enrollment.id}.${fee>0?` Fee: ${fmtMoney(fee)}.`:''} Your enrollment status is currently In Review — we'll update you once it's confirmed.`).catch(()=>{});
 }
 
 function renderStudentEnrollments(){
@@ -1173,31 +1268,20 @@ function renderStudentEnrollments(){
     <div class="section-label"><span>MY ENROLLMENTS (${mine.length})</span><span class="rule"></span></div>
     ${mine.length===0 ? `<div class="empty">You haven't enrolled in any course yet.</div>` : `
     <table>
-      <tr><th>Registration ID</th><th>Course</th><th>Dates</th><th>Status</th><th>Payment</th><th></th></tr>
+      <tr><th>Registration ID</th><th>Course</th><th>Dates</th><th>Fee</th><th>Enrollment status</th></tr>
       ${mine.map(e=>{
         const c = courseById(e.courseId);
-        const payBadge = e.paymentStatus==="paid" ? `<span class="badge ongoing">Paid</span>`
-          : e.paymentStatus==="pending" ? `<span class="badge upcoming">Pending</span>`
-          : `<span class="badge completed">Free</span>`;
         return `<tr>
           <td><span class="id-chip">${e.id}</span></td>
           <td>${c?escapeHtml(c.name):"—"}</td>
           <td>${c?`${fmtDate(c.startDate)} – ${fmtDate(c.endDate)}`:"—"}</td>
-          <td>${c?badge(courseStatus(c)):"—"}</td>
-          <td>${payBadge}</td>
-          <td>${e.paymentStatus==="pending" ? `<button class="btn small gold" onclick="payNow('${e.id}')">Pay now</button>` : ""}</td>
+          <td>${fmtMoney(e.fee)}</td>
+          <td>${admissionBadge(e.status)}</td>
         </tr>`;
       }).join("")}
     </table>
-    <div style="margin-top:12px;font-size:12px;color:var(--ink-soft);">"Pay now" simulates payment for this prototype — no real payment gateway is connected.</div>`}
+    <div style="margin-top:12px;font-size:12px;color:var(--ink-soft);">The institute confirms your enrollment after checking payment — you'll get an email as soon as your status changes.</div>`}
   `;
-}
-function payNow(enrollmentId){
-  const e = state.enrollments.find(x=>x.id===enrollmentId);
-  if(!e) return;
-  e.paymentStatus = "paid"; e.amountPaid = e.fee;
-  persist("enrollments");
-  flash("ok","Payment recorded (simulated) — no real payment gateway is connected in this prototype.");
 }
 
 function renderStudentResults(){
