@@ -8,6 +8,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 <style>
   :root{
     --ink:#26311D;
@@ -187,18 +189,47 @@ let state = {
   bulkUploadSummary: null,
 };
 
+/* ============================= FIREBASE ============================= */
+// Fill in your own project's config below — see Project Settings > General
+// > Your apps > Web app in the Firebase console. Safe to leave visible in
+// client code; Firestore security rules (not this key) control access.
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const FS_COLLECTION = "ishwari_institute"; // Firestore collection holding one doc per data key
+
 async function loadAll(){
   const keys = ["courses","students","enrollments","results","settings"];
   for(const k of keys){
     try{
-      const r = await window.storage.get(k, true);
-      if(r) state[k] = JSON.parse(r.value);
-    }catch(e){ /* key doesn't exist yet - keep default */ }
+      const snap = await db.collection(FS_COLLECTION).doc(k).get();
+      if(snap.exists){
+        const data = snap.data();
+        if(data && data.items !== undefined) state[k] = data.items;
+      }
+    }catch(e){
+      console.error("Firestore load error for", k, e);
+      flash("err", "Could not connect to the database. Check your internet connection and reload.");
+    }
   }
 }
 async function persist(key){
-  try{ await window.storage.set(key, JSON.stringify(state[key]), true); }
-  catch(e){ console.error("storage error", e); }
+  try{
+    await db.collection(FS_COLLECTION).doc(key).set({
+      items: state[key],
+      updatedAt: new Date().toISOString()
+    });
+  }catch(e){
+    console.error("Firestore save error for", key, e);
+    flash("err", "Could not save to the database — check your internet connection and try again.");
+  }
 }
 
 function flash(type, text){
