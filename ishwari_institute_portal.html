@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ISHWARI — The Institute for Conscious Living | Course Portal</title>
+<title>ISHWARI | Conscious Living Course Portal</title>
+<meta name="description" content="ISHWARI course portal for discovering courses, student registration, enrollment, results and certificates.">
+<meta name="theme-color" content="#24351f">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -149,6 +151,361 @@
 
   .footer-note{color:var(--ink-soft);font-size:12px;padding:14px 0 30px;text-align:center;}
   .footer-tagline{text-align:center;font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--gold-deep);font-size:15px;padding-top:10px;}
+
+/* =========================================================
+   ISHWARI PROFESSIONAL VISUAL REFRESH
+   UI-only enhancement: application logic remains unchanged.
+   ========================================================= */
+:root{
+  --ink:#213126;
+  --ink-soft:#65736a;
+  --paper:#f5f3ed;
+  --panel:#ffffff;
+  --line:#e4e1d7;
+  --gold:#c89a4b;
+  --gold-deep:#9f722c;
+  --green:#31543a;
+  --green-deep:#203d2a;
+  --rust:#a9563e;
+  --cream:#fbfaf6;
+  --shadow:0 12px 35px rgba(33,49,38,.08);
+  --shadow-soft:0 5px 18px rgba(33,49,38,.06);
+}
+
+html{scroll-behavior:smooth}
+body{
+  background:
+    radial-gradient(circle at 8% 0%, rgba(200,154,75,.10), transparent 28rem),
+    radial-gradient(circle at 95% 10%, rgba(49,84,58,.08), transparent 30rem),
+    var(--paper);
+  color:var(--ink);
+}
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  opacity:.16;
+  background-image:radial-gradient(rgba(33,49,38,.14) .45px, transparent .45px);
+  background-size:7px 7px;
+  z-index:-1;
+}
+.wrap{max-width:1180px;padding-left:28px;padding-right:28px}
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:40;
+  background:rgba(255,255,255,.90);
+  backdrop-filter:blur(16px);
+  box-shadow:0 1px 0 rgba(33,49,38,.07);
+}
+.topbar-inner{
+  max-width:1180px;
+  padding:13px 28px;
+}
+.brand{gap:14px}
+.brand img{height:52px;filter:drop-shadow(0 3px 8px rgba(33,49,38,.08))}
+.brand-divider{height:38px;background:#ddd8ca}
+.brand-sub-label{font-size:9px;letter-spacing:1.3px}
+.brand-sub img.bp-logo{height:21px}
+
+.btn{
+  border-radius:10px;
+  padding:10px 18px;
+  font-weight:600;
+  letter-spacing:.05px;
+  box-shadow:0 3px 10px rgba(32,61,42,.10);
+  transition:transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+}
+.btn:hover{
+  opacity:1;
+  transform:translateY(-1px);
+  box-shadow:0 7px 18px rgba(32,61,42,.14);
+}
+.btn.secondary{
+  background:rgba(255,255,255,.75);
+  border-color:#d8d5ca;
+  color:var(--ink);
+  box-shadow:none;
+}
+.btn.secondary:hover{border-color:#aeb6ac;background:#fff}
+.btn.gold{background:linear-gradient(135deg,#b77d2d,#d2a357);border-color:#b77d2d}
+.btn.green{background:linear-gradient(135deg,#254832,#3e6548);border-color:#254832}
+.btn.rust{border-radius:9px}
+.btn.small{padding:7px 12px;border-radius:8px}
+
+.hero{
+  position:relative;
+  padding:72px 0 50px;
+  display:grid;
+  grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr);
+  gap:48px;
+  align-items:center;
+}
+.hero:before{
+  content:"";
+  position:absolute;
+  width:360px;height:360px;
+  right:5%;
+  top:18px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(200,154,75,.16),transparent 68%);
+  pointer-events:none;
+}
+.hero .eyebrow{
+  color:var(--gold-deep);
+  font-size:12px;
+  letter-spacing:1.8px;
+  font-weight:700;
+  text-transform:uppercase;
+}
+.hero h1{
+  position:relative;
+  font-size:clamp(40px,5vw,64px);
+  line-height:.98;
+  max-width:720px;
+  margin-top:14px;
+  color:#213b29;
+}
+.hero p.lede{
+  color:#68766d;
+  font-size:16px;
+  line-height:1.8;
+  max-width:620px;
+  margin-top:22px;
+}
+.hero-actions{margin-top:30px}
+.hero-actions .btn:first-child{padding-left:22px;padding-right:22px}
+
+.hero:after{
+  content:"";
+  display:block;
+}
+.hero .portal-visual{
+  position:relative;
+  z-index:1;
+  min-height:320px;
+  border:1px solid rgba(200,154,75,.28);
+  border-radius:24px;
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.94),rgba(247,244,234,.88));
+  box-shadow:var(--shadow);
+  padding:25px;
+  overflow:hidden;
+}
+.portal-visual .pv-glow{
+  position:absolute; width:180px;height:180px;right:-50px;top:-60px;border-radius:50%;
+  background:rgba(49,84,58,.12);
+}
+.portal-visual .pv-kicker{font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:var(--gold-deep);font-weight:700}
+.portal-visual h3{font-size:29px;line-height:1.05;margin-top:8px;color:var(--green-deep)}
+.portal-visual .pv-line{height:1px;background:var(--line);margin:22px 0}
+.portal-visual .pv-item{display:flex;justify-content:space-between;gap:15px;padding:12px 0;border-bottom:1px solid #ebe8df;font-size:12.5px}
+.portal-visual .pv-item:last-child{border-bottom:0}
+.portal-visual .pv-pill{background:#e7eee7;color:#31543a;border-radius:999px;padding:4px 9px;font-size:10px;font-weight:700}
+
+.section-label{
+  margin-top:10px;
+  margin-bottom:18px;
+  font-weight:700;
+  font-size:11px;
+  letter-spacing:1.5px;
+  color:#718076;
+}
+.section-label .rule{background:#ddd9ce}
+
+.course-row{
+  background:rgba(255,255,255,.72);
+  border:1px solid transparent;
+  border-bottom-color:var(--line);
+  border-radius:12px;
+  padding:19px 20px;
+  margin-bottom:9px;
+  transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease, background .16s ease;
+}
+.course-row:hover{
+  background:#fff;
+  border-color:#e4dfd2;
+  transform:translateY(-2px);
+  box-shadow:var(--shadow-soft);
+}
+.course-name{font-size:20px;color:#294432}
+.course-desc{line-height:1.65}
+.course-dates{font-size:12px}
+.badge{border-radius:999px;padding:4px 10px;font-weight:600}
+
+.panel{
+  border:1px solid #e1ddd2;
+  border-radius:16px;
+  padding:28px 30px;
+  margin-bottom:26px;
+  box-shadow:var(--shadow-soft);
+  background:rgba(255,255,255,.94);
+}
+.panel.accent{
+  border-left:0;
+  border-top:3px solid var(--gold);
+}
+.panel h2{font-size:26px;color:var(--green-deep)}
+.panel .sub{line-height:1.7}
+fieldset{margin-bottom:28px}
+legend{
+  font-size:19px;
+  letter-spacing:.1px;
+  color:var(--green-deep);
+  border-bottom:1px solid #e6e2d8;
+  padding-bottom:9px;
+}
+.field{margin-bottom:16px}
+.field label{font-weight:600;color:#59685e}
+.field input,.field select,.field textarea{
+  border:1px solid #dcd9d0;
+  border-radius:9px;
+  padding:11px 13px;
+  background:#fff;
+  transition:border-color .15s, box-shadow .15s;
+}
+.field input:hover,.field select:hover,.field textarea:hover{border-color:#c5c9c0}
+.field input:focus,.field select:focus,.field textarea:focus{
+  border-color:#9f722c;
+  box-shadow:0 0 0 3px rgba(200,154,75,.13);
+}
+.terms-box{border-radius:9px;background:#faf9f4}
+
+.shell{
+  max-width:1180px;
+  min-height:calc(100vh - 78px);
+}
+.nav{
+  width:220px;
+  padding:28px 16px;
+  border-right:0;
+  background:rgba(255,255,255,.55);
+}
+.nav .navlabel{
+  padding:0 10px;
+  letter-spacing:1.4px;
+  font-weight:700;
+  text-transform:uppercase;
+}
+.nav button{
+  border-radius:10px;
+  padding:11px 12px;
+  margin-bottom:4px;
+  font-weight:500;
+}
+.nav button:hover{background:#e9eee8;color:#294432}
+.nav button.active{
+  background:linear-gradient(135deg,#254832,#3b6045);
+  box-shadow:0 7px 18px rgba(32,61,42,.15);
+}
+.main{padding:34px 36px}
+
+table{
+  background:#fff;
+  border:1px solid #e3dfd5;
+  border-radius:13px;
+  overflow:hidden;
+  box-shadow:var(--shadow-soft);
+}
+th{
+  background:#f5f3ec;
+  color:#637167;
+  padding:12px 11px;
+  font-weight:700;
+  letter-spacing:.7px;
+  text-transform:uppercase;
+  font-size:10.5px;
+  border-bottom:1px solid #dfdbd0;
+}
+td{padding:13px 11px}
+tr:hover td{background:#fcfbf7}
+.id-chip{
+  border-radius:999px;
+  background:#eef1ea;
+  color:#35533d;
+  padding:4px 9px;
+}
+
+.msg{border-radius:10px;padding:11px 14px}
+.empty{
+  background:rgba(255,255,255,.65);
+  border:1px dashed #d8d4c8;
+  border-radius:12px;
+  padding:32px;
+  text-align:center;
+}
+
+.pagination .btn{min-width:36px}
+
+.certificate{
+  border:2px solid #c89a4b;
+  border-radius:8px;
+  padding:3px;
+  background:#fff;
+  box-shadow:var(--shadow);
+}
+.certificate-inner{
+  border:1px solid #d9bd83;
+  border-radius:5px;
+  padding:48px 42px;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(200,154,75,.10),transparent 40%),
+    #fff;
+}
+
+.footer-tagline{
+  margin-top:52px;
+  font-size:18px;
+  letter-spacing:.3px;
+}
+.footer-note{color:#77837b}
+
+.modal-box{
+  border-radius:16px;
+  box-shadow:0 24px 70px rgba(20,35,25,.22);
+  padding:30px;
+}
+
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr;gap:26px;padding-top:48px}
+  .hero .portal-visual{max-width:620px}
+  .shell{display:block}
+  .nav{
+    width:auto;
+    display:flex;
+    gap:6px;
+    overflow-x:auto;
+    padding:12px 16px;
+    border-bottom:1px solid var(--line);
+    position:sticky;
+    top:78px;
+    z-index:20;
+    background:rgba(255,255,255,.94);
+  }
+  .nav .navlabel{display:none}
+  .nav button{white-space:nowrap;margin:0}
+  .main{padding:24px 20px}
+}
+@media (max-width:640px){
+  .wrap{padding-left:18px;padding-right:18px}
+  .topbar-inner{padding:11px 18px}
+  .brand img{height:43px}
+  .brand-divider{height:30px}
+  .brand-sub{display:none}
+  .topbar-actions .btn{padding:7px 10px;font-size:11.5px}
+  .hero{padding:40px 0 32px}
+  .hero h1{font-size:42px}
+  .hero-actions{display:grid;grid-template-columns:1fr}
+  .hero-actions .btn{width:100%}
+  .portal-visual{min-height:auto}
+  .panel{padding:21px 18px;border-radius:13px}
+  .main{padding:20px 14px}
+  table{display:block;overflow-x:auto;white-space:nowrap}
+  .course-row{display:block}
+  .course-row > div:last-child{text-align:left!important;margin-top:12px}
+}
+
 </style>
 </head>
 <body>
@@ -379,13 +736,25 @@ function renderLanding(){
     ${topbar(false)}
     <div class="wrap">
       <div class="hero">
-        <div class="eyebrow">ISHWARI — THE INSTITUTE FOR CONSCIOUS LIVING</div>
-        <h1>Course registration, results and certificates — one portal.</h1>
-        <p class="lede">Browse upcoming courses, register with your details, enroll once registration is confirmed, and collect your results and certificates all in one place.</p>
-        <div class="hero-actions">
-          <button class="btn gold" onclick="go('studentRegister')">Register as a new student</button>
-          <button class="btn secondary" onclick="go('studentLogin')">Student login</button>
-          <button class="btn secondary" onclick="go('adminLogin')">Admin login</button>
+        <div>
+          <div class="eyebrow">ISHWARI — THE INSTITUTE FOR CONSCIOUS LIVING</div>
+          <h1>Learn with intention. Grow with awareness.</h1>
+          <p class="lede">A calm, secure course portal to discover upcoming programmes, register as a student, track enrollment, view results and access certificates.</p>
+          <div class="hero-actions">
+            <button class="btn gold" onclick="go('studentRegister')">Register as a new student</button>
+            <button class="btn secondary" onclick="go('studentLogin')">Student login</button>
+            <button class="btn secondary" onclick="go('adminLogin')">Admin login</button>
+          </div>
+        </div>
+        <div class="portal-visual" aria-label="Portal highlights">
+          <div class="pv-glow"></div>
+          <div class="pv-kicker">Your learning journey</div>
+          <h3>One thoughtful place for every step.</h3>
+          <div class="pv-line"></div>
+          <div class="pv-item"><span>Explore upcoming courses</span><span class="pv-pill">Discover</span></div>
+          <div class="pv-item"><span>Complete your registration</span><span class="pv-pill">Register</span></div>
+          <div class="pv-item"><span>Track enrollment &amp; results</span><span class="pv-pill">Track</span></div>
+          <div class="pv-item"><span>Access your certificate</span><span class="pv-pill">Achieve</span></div>
         </div>
       </div>
 
