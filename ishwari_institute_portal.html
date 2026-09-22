@@ -12,6 +12,7 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
 <style>
   :root{
     --ink:#26311D;
@@ -518,12 +519,11 @@ const LOGO_SRC = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAkQAAACWCAIAAACw
 const BP_LOGO_SRC = "https://breathingpoint.in/assets/img/logo-horizontal.png";
 
 /* ============================= DATA LAYER ============================= */
-const ADMIN_PASSWORD = "admin123";
 const CATALOG_PAGE_SIZE = 6;
 const ADMIN_COURSE_PAGE_SIZE = 8;
 const SUPPORT_PHONE = "+91 98232 03407";
 const NOTIFY_FROM_EMAIL = "breathingpointstudio@gmail.com";
-const SUPPORT_NOTE = "Password resets are handled by the institute admin only — there is no self-service reset. Please contact us at " + SUPPORT_PHONE + " or via breathingpoint.in/contact.html with your registered email, and we'll reset it for you.";
+const SUPPORT_NOTE = "Enter your registered email and use the password-reset option to receive a Firebase password reset email.";
 
 let state = {
   view: "landing",
@@ -560,6 +560,7 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const auth = firebase.auth();
 const FS_COLLECTION = "ishwari_institute"; // Firestore collection holding one doc per data key
 
 async function loadAll(){
@@ -844,21 +845,35 @@ function renderAdminLogin(){
       ${msgBlock()}
       <div class="panel accent">
         <h2>Admin login</h2>
-        <div class="sub">Publish courses, review registrations, and manage results.</div>
-        <div class="field"><label>Password</label><input id="adminPass" type="password" placeholder="Enter admin password"></div>
+        <div class="sub">Sign in with the administrator account configured in Firebase Authentication.</div>
+        <div class="field"><label>Email</label><input id="adminEmail" type="email" autocomplete="username" placeholder="admin@ishwariyogainstitute.in"></div>
+        <div class="field"><label>Password</label><input id="adminPass" type="password" autocomplete="current-password" placeholder="Enter your password"></div>
         <button class="btn gold" style="width:100%" onclick="submitAdminLogin()">Log in</button>
+        <div style="margin-top:10px;text-align:center;"><button class="btn secondary small" onclick="resetPassword('adminEmail','adminResetNote')">Forgot password?</button></div>
+        <div id="adminResetNote"></div>
         <div style="margin-top:14px;"><button class="btn secondary small" onclick="goLanding()">&larr; Back</button></div>
       </div>
     </div>
   `;
 }
-function submitAdminLogin(){
+async function submitAdminLogin(){
+  const email = document.getElementById("adminEmail").value.trim().toLowerCase();
   const pass = document.getElementById("adminPass").value;
-  if(pass === ADMIN_PASSWORD){
+  if(!email || !pass){ flash("err", "Enter your administrator email and password."); return; }
+  try{
+    const credential = await auth.signInWithEmailAndPassword(email, pass);
+    const user = credential.user;
+    const profile = await db.collection("users").doc(user.uid).get();
+    if(!profile.exists || profile.data().role !== "admin" || profile.data().active === false){
+      await auth.signOut();
+      flash("err", "This account is authenticated but is not authorised as an active administrator. Create users/" + user.uid + " with role: admin in Firestore.");
+      return;
+    }
     state.role = "admin"; state.view = "adminDashboard"; state.adminTab="courses";
     render();
-  } else {
-    flash("err", "Incorrect password.");
+  }catch(e){
+    console.error("Admin authentication failed", e);
+    flash("err", "Invalid administrator email or password.");
   }
 }
 
@@ -1524,7 +1539,7 @@ function onMedicalChange(){
   const val = document.querySelector('input[name="rMedical"]:checked').value;
   document.getElementById("rMedicalDetailWrap").style.display = val === "yes" ? "block" : "none";
 }
-function submitRegistration(){
+async function submitRegistration(){
   const name = document.getElementById("rName").value.trim();
   const dob = document.getElementById("rDob").value;
   const genderEl = document.querySelector('input[name="rGender"]:checked');
@@ -1544,31 +1559,42 @@ function submitRegistration(){
 
   localError("registerMsg", null);
   if(!name || !dob || !genderEl || !occupation || !mobile || !email || !address || !education || !examLangEl || !purpose || !pass){
-    localError("registerMsg","Please complete all fields before submitting.");
-    return;
+    localError("registerMsg","Please complete all fields before submitting."); return;
   }
   if(!/^\S+@\S+\.\S+$/.test(email)){ localError("registerMsg","Enter a valid email address."); return; }
+  if(pass.length < 6){ localError("registerMsg","Password must be at least 6 characters."); return; }
   if(priorYoga === "yes" && !priorYogaDetail){ localError("registerMsg","Please specify your prior yoga knowledge/certification."); return; }
   if(medical === "yes" && !medicalDetail){ localError("registerMsg","Please specify the medical condition we should be aware of."); return; }
   if(!agree){ localError("registerMsg","Please agree to the terms and conditions to continue."); return; }
   if(state.students.some(s=>s.email===email)){ localError("registerMsg","An account with this email already exists — try logging in instead."); return; }
 
-  const student = {
-    id: nextId("STU", state.students), name, dob, age: calcAge(dob), gender: genderEl.value,
-    occupation, mobile, email, address, education,
-    priorYoga, priorYogaDetail, examLanguage: examLangEl.value,
-    medical, medicalDetail, purpose,
-    password: pass, agreedAt: new Date().toISOString(), registeredAt: new Date().toISOString()
-  };
-  state.students.push(student);
-  persist("students");
-  state.currentStudent = student;
-  state.view = "studentDashboard";
-  state.studentTab = "enroll";
-  render();
-  flash("ok", `Registration confirmed. Your Student ID is ${student.id} — you're logged in and ready to enroll.`);
-  sendEmail(student.email, student.name, "Registration confirmed",
-    `Your Student ID is ${student.id}. You can now log in to enroll in courses.`).catch(()=>{});
+  try{
+    const credential = await auth.createUserWithEmailAndPassword(email, pass);
+    const uid = credential.user.uid;
+    const now = new Date().toISOString();
+    const student = {
+      id: nextId("STU", state.students), uid, name, dob, age: calcAge(dob), gender: genderEl.value,
+      occupation, mobile, email, address, education, priorYoga, priorYogaDetail,
+      examLanguage: examLangEl.value, medical, medicalDetail, purpose,
+      agreedAt: now, registeredAt: now
+    };
+    state.students.push(student);
+    await persist("students");
+    state.currentStudent = student;
+    state.role = "student";
+    state.view = "studentDashboard";
+    state.studentTab = "enroll";
+    render();
+    flash("ok", `Registration confirmed. Your Student ID is ${student.id} — you're logged in and ready to enroll.`);
+    sendEmail(student.email, student.name, "Registration confirmed",
+      `Your Student ID is ${student.id}. You can now log in to enroll in courses.`).catch(()=>{});
+  }catch(e){
+    console.error("Student registration failed", e);
+    const msg = e && e.code === "auth/email-already-in-use" ? "An account with this email already exists — try logging in instead." :
+      e && e.code === "auth/weak-password" ? "Password is too weak. Use at least 6 characters." :
+      "Registration could not be completed. Please try again.";
+    localError("registerMsg", msg);
+  }
 }
 
 /* ---------- Student login ---------- */
@@ -1595,18 +1621,48 @@ function renderStudentLogin(){
   `;
 }
 function showForgotPassword(){
-  document.getElementById("forgotNote").innerHTML = `<div class="msg ok" style="margin-top:12px;">${SUPPORT_NOTE}</div>`;
+  resetPassword("lEmail", "forgotNote");
 }
-function submitStudentLogin(){
+async function resetPassword(inputId, noteId){
+  const input = document.getElementById(inputId);
+  const note = document.getElementById(noteId);
+  const email = input ? input.value.trim().toLowerCase() : "";
+  if(!email){ if(note) note.innerHTML = `<div class="msg err" style="margin-top:12px;">Enter your registered email first.</div>`; return; }
+  try{
+    await auth.sendPasswordResetEmail(email);
+    if(note) note.innerHTML = `<div class="msg ok" style="margin-top:12px;">Password reset email sent. Please check your inbox.</div>`;
+  }catch(e){
+    console.error("Password reset failed", e);
+    if(note) note.innerHTML = `<div class="msg err" style="margin-top:12px;">Unable to send reset email. Check the email address and Firebase Authentication settings.</div>`;
+  }
+}
+async function submitStudentLogin(){
   const email = document.getElementById("lEmail").value.trim().toLowerCase();
   const pass = document.getElementById("lPass").value;
-  const student = state.students.find(s=>s.email===email && s.password===pass);
-  if(!student){ flash("err","No matching account found. Check your email and password, or use \"Forgot password?\" below."); return; }
-  state.currentStudent = student;
-  state.role = "student";
-  state.view = "studentDashboard";
-  state.studentTab = "enroll";
-  render();
+  if(!email || !pass){ flash("err", "Enter your email and password."); return; }
+  try{
+    const credential = await auth.signInWithEmailAndPassword(email, pass);
+    const user = credential.user;
+    let student = state.students.find(s=>s.uid===user.uid);
+    if(!student) student = state.students.find(s=>s.email===email);
+    if(!student){
+      await auth.signOut();
+      flash("err","Your Firebase account is valid, but no student profile was found. Please contact the institute administrator.");
+      return;
+    }
+    if(student.uid !== user.uid){
+      student.uid = user.uid;
+      await persist("students");
+    }
+    state.currentStudent = student;
+    state.role = "student";
+    state.view = "studentDashboard";
+    state.studentTab = "enroll";
+    render();
+  }catch(e){
+    console.error("Student authentication failed", e);
+    flash("err","Invalid email or password. If you forgot your password, use the password-reset option below.");
+  }
 }
 
 /* ---------- Student shell ---------- */
@@ -1753,10 +1809,35 @@ function viewCertificate(enrollmentId){
 }
 
 /* ---------- shared ---------- */
-function logout(){
+async function logout(){
+  try{ await auth.signOut(); }catch(e){ console.error("Logout failed", e); }
   state.role = null; state.currentStudent = null; state.view = "landing"; state.message = null;
   render();
 }
+
+/* ============================= AUTH SESSION ============================= */
+auth.onAuthStateChanged(async (user) => {
+  if(!user){
+    if(state.role){ state.role=null; state.currentStudent=null; state.view="landing"; render(); }
+    return;
+  }
+  // Restore a student session after a page refresh. Admin sessions are restored
+  // only after verifying the users/{uid}.role document.
+  try{
+    const profile = await db.collection("users").doc(user.uid).get();
+    if(profile.exists && profile.data().role === "admin" && profile.data().active !== false){
+      state.role = "admin"; state.view = "adminDashboard"; state.adminTab = "courses";
+      render();
+      return;
+    }
+    const student = state.students.find(s=>s.uid===user.uid || s.email===user.email.toLowerCase());
+    if(student){
+      if(student.uid !== user.uid){ student.uid = user.uid; await persist("students"); }
+      state.currentStudent = student; state.role="student"; state.view="studentDashboard";
+      state.studentTab="enroll"; render();
+    }
+  }catch(e){ console.error("Auth session restore failed", e); }
+});
 
 /* ============================= INIT ============================= */
 (async function init(){
