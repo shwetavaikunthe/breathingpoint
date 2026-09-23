@@ -12,6 +12,7 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
 <style>
   :root{
@@ -533,6 +534,7 @@ let state = {
   students: [],
   enrollments: [],
   results: [],
+  certificates: [],
   settings: { serviceId:"", templateId:"", publicKey:"" },
   message: null,
   adminTab: "courses",
@@ -544,6 +546,9 @@ let state = {
   catalogCategory: "",
   catalogPage: 1,
   bulkUploadSummary: null,
+  pendingCertFiles: {},
+  pendingCertRows: null,
+  certUploadSummary: null,
 };
 
 /* ============================= FIREBASE ============================= */
@@ -560,11 +565,12 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const storage = firebase.storage();
 const auth = firebase.auth();
 const FS_COLLECTION = "ishwari_institute"; // Firestore collection holding one doc per data key
 
 async function loadAll(){
-  const keys = ["courses","students","enrollments","results","settings"];
+  const keys = ["courses","students","enrollments","results","certificates","settings"];
   for(const k of keys){
     try{
       const snap = await db.collection(FS_COLLECTION).doc(k).get();
@@ -736,13 +742,12 @@ function renderLanding(){
   return `
     ${topbar(false)}
     <div class="wrap">
-  
+      <div class="hero">
         <div>
           <div class="eyebrow">ISHWARI — THE INSTITUTE FOR CONSCIOUS LIVING</div>
           <h1>Learn with intention. Grow with awareness.</h1>
           <p class="lede">A calm, secure course portal to discover upcoming programmes, register as a student, track enrollment, view results and access certificates.</p>
-              <div class="hero">
-      <div class="hero-actions">
+          <div class="hero-actions">
             <button class="btn gold" onclick="go('studentRegister')">Register as a new student</button>
             <button class="btn secondary" onclick="go('studentLogin')">Student login</button>
             <button class="btn secondary" onclick="go('adminLogin')">Admin login</button>
@@ -1087,25 +1092,28 @@ function openResetPassword(studentId){
     <div class="modal-backdrop" onclick="if(event.target===this) closeModal();">
       <div class="modal-box" style="max-width:420px;">
         <h2 style="font-size:18px;">Reset password — ${escapeHtml(st.name)}</h2>
-        <div class="sub">Set a new password and share it with the student directly. There is no self-service email reset in this portal.</div>
-        <div class="field"><label>New password</label><input id="newPass" type="text" placeholder="New password (min 4 characters)"></div>
-        <div style="display:flex;gap:10px;">
-          <button class="btn green" onclick="confirmResetPassword('${st.id}')">Save new password</button>
+        <div class="sub">This sends a Firebase password-reset email to <strong>${escapeHtml(st.email)}</strong>. There's no way to set a password for a student directly from the admin panel — Firebase requires the student to confirm the change themselves via email.</div>
+        <div style="display:flex;gap:10px;margin-top:10px;">
+          <button class="btn green" onclick="confirmResetPassword('${st.id}')">Send reset email</button>
           <button class="btn secondary" onclick="closeModal()">Cancel</button>
         </div>
       </div>
     </div>
   `);
 }
-function confirmResetPassword(studentId){
-  const val = document.getElementById("newPass").value;
-  if(!val || val.length < 4){ flash("err","Enter a password of at least 4 characters."); return; }
+async function confirmResetPassword(studentId){
   const st = studentById(studentId);
   if(!st) return;
-  st.password = val;
-  persist("students");
-  closeModal();
-  flash("ok", `Password reset for ${st.name}. Share the new password with them directly.`);
+  try{
+    await auth.sendPasswordResetEmail(st.email);
+    closeModal();
+    flash("ok", `Password reset email sent to ${st.email}.`);
+  }catch(e){
+    console.error("Password reset email failed", e);
+    let msg = "Could not send the reset email.";
+    if(e && e.code === "auth/user-not-found") msg = `No Firebase login exists for ${st.email} yet. This student likely registered before Firebase login was enabled — add them under Authentication → Users in the Firebase console first (any temporary password), then they can log in and reset it themselves.`;
+    flash("err", msg);
+  }
 }
 
 function admissionBadge(status){
@@ -1235,7 +1243,62 @@ function renderAdminResults(){
           </tr>`;
         }).join("")}
       </table>`}
+
+      ${renderAdminCertificateUpload(selectedId)}
     `}
+  `;
+}
+function renderAdminCertificateUpload(courseId){
+  const uploaded = state.certificates.filter(c=>c.courseId===courseId);
+  const byEnrollment = {};
+  uploaded.forEach(c=>{ (byEnrollment[c.enrollmentId] = byEnrollment[c.enrollmentId] || []).push(c); });
+  const summary = state.certUploadSummary;
+  return `
+    <div class="panel" style="margin-top:18px;">
+      <h2 style="font-size:16px;">Upload certificates</h2>
+      <div class="sub">
+        A course can have several certificates per student (e.g. Completion, Attendance, Practicum).
+        1) Download the mapping template below. 2) For each certificate, add a row with the student's Registration ID,
+        a Certificate Type label, and the exact file name you'll select in step 3 (duplicate the row for a student's
+        2nd/3rd/4th certificate). 3) Select all the certificate files at once. 4) Upload the filled mapping CSV, then click Upload.
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px;">
+        <button class="btn secondary small" onclick="downloadCertTemplate('${courseId}')">Download mapping CSV</button>
+      </div>
+      <div class="field">
+        <label>Select certificate files (PDF or image, select all at once)</label>
+        <input type="file" multiple accept=".pdf,.jpg,.jpeg,.png" onchange="onCertificateFilesSelected(event)">
+        <div id="certFilesSummary"></div>
+      </div>
+      <div class="field">
+        <label>Upload filled mapping CSV</label>
+        <input type="file" accept=".csv" onchange="onCertMappingCSVSelected(event)">
+        <div id="certMappingSummary"></div>
+      </div>
+      <button class="btn green" onclick="processCertificateUpload()">Upload certificates</button>
+      ${summary ? `<div class="msg ${(summary.missingFiles.length||summary.badRows.length)?'err':'ok'}" style="margin-top:12px;">
+        Uploaded ${summary.uploaded} certificate(s).
+        ${summary.missingFiles.length ? ' No matching selected file for: ' + summary.missingFiles.map(escapeHtml).join(', ') + '.' : ''}
+        ${summary.badRows.length ? ' Not matched to this course/roster: ' + summary.badRows.map(escapeHtml).join(', ') + '.' : ''}
+      </div>` : ""}
+
+      ${uploaded.length===0 ? `<div class="empty" style="margin-top:14px;">No certificates uploaded for this course yet.</div>` : `
+      <table style="margin-top:14px;">
+        <tr><th>Student</th><th>Reg. ID</th><th>Certificate Type</th><th>File</th><th>Uploaded</th><th></th></tr>
+        ${Object.keys(byEnrollment).flatMap(enrollmentId=>{
+          const en = state.enrollments.find(e=>e.id===enrollmentId);
+          const st = en && studentById(en.studentId);
+          return byEnrollment[enrollmentId].map(c=>`<tr>
+            <td>${st?escapeHtml(st.name):"—"}</td>
+            <td><span class="id-chip">${enrollmentId}</span></td>
+            <td>${escapeHtml(c.certType)}</td>
+            <td><a href="${c.url}" target="_blank" rel="noopener">${escapeHtml(c.fileName)}</a></td>
+            <td>${fmtDate(c.uploadedAt.slice(0,10))}</td>
+            <td><button class="btn small secondary" onclick="deleteCertificate('${c.id}')">Remove</button></td>
+          </tr>`);
+        }).join("")}
+      </table>`}
+    </div>
   `;
 }
 function publishResult(enrollmentId){
@@ -1365,6 +1428,100 @@ function onBulkFileSelected(evt){
   reader.readAsText(file);
 }
 
+/* ---------- Certificate uploads (files, via Firebase Storage) ---------- */
+function courseCertTemplateCSV(courseId){
+  const roster = state.enrollments.filter(e=>e.courseId===courseId);
+  const rows = [["RegistrationID","StudentName","CertificateType","FileName"]];
+  roster.forEach(e=>{
+    const st = studentById(e.studentId);
+    rows.push([e.id, st?st.name:"", "", ""]);
+  });
+  return rows.map(r=>r.map(csvEscape).join(",")).join("\n");
+}
+function downloadCertTemplate(courseId){
+  const c = courseById(courseId);
+  downloadCSV(`certificates-${c?c.name.replace(/[^a-z0-9]+/gi,'-'):courseId}.csv`, courseCertTemplateCSV(courseId));
+}
+function onCertificateFilesSelected(event){
+  const files = Array.from(event.target.files || []);
+  state.pendingCertFiles = {};
+  files.forEach(f => { state.pendingCertFiles[f.name] = f; });
+  const el = document.getElementById("certFilesSummary");
+  if(el) el.innerHTML = files.length
+    ? `<div class="msg ok">${files.length} file(s) ready: ${files.map(f=>escapeHtml(f.name)).join(", ")}</div>`
+    : "";
+}
+function parseCertMappingCSV(text){
+  const rows = parseCSV(text);
+  if(rows.length===0) return { error:"The file appears to be empty." };
+  const header = rows[0].map(h=>h.trim().toLowerCase());
+  const idIdx = header.indexOf("registrationid");
+  const typeIdx = header.indexOf("certificatetype");
+  const fileIdx = header.indexOf("filename");
+  if(idIdx===-1 || fileIdx===-1) return { error:"CSV must include RegistrationID and FileName columns." };
+  const out = [];
+  for(let i=1;i<rows.length;i++){
+    const r = rows[i];
+    if(!r[idIdx] || !(r[fileIdx]||"").trim()) continue;
+    out.push({ regId: r[idIdx].trim(), certType: typeIdx>-1 ? (r[typeIdx]||"").trim() : "", fileName: r[fileIdx].trim() });
+  }
+  return { rows: out };
+}
+function onCertMappingCSVSelected(event){
+  const file = event.target.files && event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const parsed = parseCertMappingCSV(e.target.result);
+    const el = document.getElementById("certMappingSummary");
+    if(parsed.error){ if(el) el.innerHTML = `<div class="msg err">${parsed.error}</div>`; state.pendingCertRows = null; return; }
+    state.pendingCertRows = parsed.rows;
+    if(el) el.innerHTML = `<div class="msg ok">Mapping loaded: ${parsed.rows.length} certificate row(s). Click "Upload certificates" below.</div>`;
+  };
+  reader.readAsText(file);
+}
+async function processCertificateUpload(){
+  const courseId = state.resultCourseId;
+  const rows = state.pendingCertRows;
+  const files = state.pendingCertFiles || {};
+  if(!courseId){ flash("err","Select a course first."); return; }
+  if(!rows || rows.length===0){ flash("err","Upload a filled mapping CSV first."); return; }
+  let uploaded = 0; const missingFiles = []; const badRows = [];
+  for(const row of rows){
+    const enrollment = state.enrollments.find(e=>e.id===row.regId && e.courseId===courseId);
+    if(!enrollment){ badRows.push(row.regId); continue; }
+    const file = files[row.fileName];
+    if(!file){ missingFiles.push(row.fileName); continue; }
+    try{
+      const path = `certificates/${courseId}/${enrollment.id}/${Date.now()}-${row.fileName}`;
+      const snap = await storage.ref(path).put(file);
+      const url = await snap.ref.getDownloadURL();
+      state.certificates.push({
+        id: nextId("CERTF", state.certificates),
+        enrollmentId: enrollment.id, courseId,
+        certType: row.certType || "Certificate",
+        fileName: row.fileName, url, uploadedAt: new Date().toISOString()
+      });
+      uploaded++;
+    }catch(err){
+      console.error("Certificate upload failed", err);
+      badRows.push(`${row.regId} (${row.fileName})`);
+    }
+  }
+  await persist("certificates");
+  state.certUploadSummary = { uploaded, missingFiles, badRows };
+  state.pendingCertRows = null; state.pendingCertFiles = {};
+  render();
+  if(uploaded > 0) flash("ok", `Uploaded ${uploaded} certificate(s).`);
+}
+function deleteCertificate(certId){
+  if(!confirm("Remove this certificate? Students will no longer see it.")) return;
+  state.certificates = state.certificates.filter(c=>c.id!==certId);
+  persist("certificates");
+  render();
+  flash("ok","Certificate removed.");
+}
+
 /* ---------- Admin: email settings ---------- */
 function renderAdminSettings(){
   const s = state.settings || {};
@@ -1409,7 +1566,7 @@ function renderAdminExport(){
       </div>
       <button class="btn gold" onclick="exportToExcel()">Download Excel workbook</button>
       <div style="margin-top:14px;font-size:12.5px;color:var(--ink-soft);">
-        ${state.students.length} registrations · ${state.enrollments.length} enrollments · ${state.results.length} results as of now.
+        ${state.students.length} registrations · ${state.enrollments.length} enrollments · ${state.results.length} results · ${state.certificates.length} certificate file(s) as of now.
       </div>
     </div>
   `;
@@ -1757,6 +1914,7 @@ function renderStudentResults(){
   const s = state.currentStudent;
   const mine = state.enrollments.filter(e=>e.studentId===s.id);
   const withResults = mine.map(e=>({e, r: state.results.find(r=>r.enrollmentId===e.id)})).filter(x=>x.r);
+  const myCertFiles = state.certificates.filter(c=>mine.some(e=>e.id===c.enrollmentId));
   return `
     <div class="section-label"><span>RESULTS &amp; CERTIFICATES</span><span class="rule"></span></div>
     ${withResults.length===0 ? `<div class="empty">No results have been published for you yet.</div>` : `
@@ -1770,6 +1928,21 @@ function renderStudentResults(){
           <td>${r.grade||"—"}</td>
           <td>${r.pass ? `<span class="badge ongoing">Pass</span>` : `<span class="badge completed">Fail</span>`}</td>
           <td>${r.pass ? `<button class="btn small gold" onclick="viewCertificate('${e.id}')">View certificate</button>` : ""}</td>
+        </tr>`;
+      }).join("")}
+    </table>`}
+
+    <div class="section-label" style="margin-top:22px;"><span>MY CERTIFICATE DOWNLOADS</span><span class="rule"></span></div>
+    ${myCertFiles.length===0 ? `<div class="empty">No certificates have been uploaded for you yet.</div>` : `
+    <table>
+      <tr><th>Course</th><th>Certificate Type</th><th>Issued</th><th></th></tr>
+      ${myCertFiles.map(c=>{
+        const co = courseById(c.courseId);
+        return `<tr>
+          <td>${co?escapeHtml(co.name):"—"}</td>
+          <td>${escapeHtml(c.certType)}</td>
+          <td>${fmtDate(c.uploadedAt.slice(0,10))}</td>
+          <td><a class="btn small gold" href="${c.url}" target="_blank" rel="noopener" download>Download</a></td>
         </tr>`;
       }).join("")}
     </table>`}
