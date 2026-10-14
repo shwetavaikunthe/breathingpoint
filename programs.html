@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/care-highlight.css">
 </head>
 <body>
 
@@ -58,27 +59,44 @@
   </nav>
 
   <!-- BREATHING POINT CARE -->
-  <section id="care" class="section-alt">
-    <div class="container">
-      <div class="section-head">
-        <p class="eyebrow">Breathing Point Care</p>
-        <h2>Certified Yoga Teachers &amp; Physiotherapists</h2>
+  <section id="care" class="care-band" aria-labelledby="care-title">
+    <div class="container care-inner">
+      <p class="care-eyebrow">Breathing Point Care</p>
+      <h2 id="care-title" class="care-tagline"><span>Har Ghar YOG</span></h2>
+      <p class="care-sub">Good health, at every home.</p>
+      <p class="care-objective">The main objective of <strong>Breathing Point Care</strong> is to reach good health at every home, by connecting families with certified yoga teachers and physiotherapists in their own neighbourhood.</p>
+
+      <blockquote class="care-vision">
+        <p>&ldquo;Swasth Rahega India, Tab Badhega India&rdquo;</p>
+        <footer>The Prime Minister&rsquo;s vision of a healthy India. It begins with a healthy home.</footer>
+      </blockquote>
+
+      <div class="care-cards">
+        <article class="care-card is-featured">
+          <span class="care-badge">Start here</span>
+          <span class="care-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M12 17.2c-2.4-1.5-3.4-2.7-3.4-4.1a1.9 1.9 0 0 1 3.4-1.1 1.9 1.9 0 0 1 3.4 1.1c0 1.4-1 2.6-3.4 4.1Z"/></svg></span>
+          <h3>Families, patients &amp; yoga seekers</h3>
+          <p>Find a certified yoga teacher or physiotherapist within 6&nbsp;km of your home, with their timings and fees.</p>
+          <a class="care-btn care-btn-primary" href="care/#/join">Register to find care</a>
+        </article>
+
+        <article class="care-card">
+          <span class="care-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5.5" r="2.2"/><path d="M12 8.5v4.2"/><path d="M5 11.5c2.2 1 4.4 1.5 7 1.5s4.8-.5 7-1.5"/><path d="M7.5 20.5c.6-3 2.2-4.8 4.5-4.8s3.9 1.8 4.5 4.8"/></svg></span>
+          <h3>Yoga teachers</h3>
+          <p>Certified yoga teacher? Publish your group batches and home-visit classes.</p>
+          <a class="care-btn care-btn-outline" href="care/#/yoga">Register as a Yoga Teacher</a>
+        </article>
+
+        <article class="care-card">
+          <span class="care-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M12 8v8M8 12h8"/></svg></span>
+          <h3>Physiotherapists</h3>
+          <p>Certified physiotherapist? Publish your clinic and home-visit timings.</p>
+          <a class="care-btn care-btn-outline" href="care/#/physio">Register as a Physiotherapist</a>
+        </article>
       </div>
-      <p style="text-align:center;max-width:62ch;margin:0 auto 28px;color:var(--ink-soft);">Certified yoga teachers and physiotherapists can now register with Breathing Point Care to publish their class and clinic timings, home-visit slots and fees. Patients and yoga seekers can register to find certified professionals within 6 km. Online appointment booking will open soon.</p>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;max-width:760px;margin:0 auto;">
-        <div class="card petal-card" style="text-align:center;">
-          <h3 style="font-size:1.15rem">Yoga Class</h3>
-          <p>For certified yoga teachers: publish group batches and home-visit sessions.</p>
-          <a href="care/#/yoga" class="btn btn-primary" style="margin-top:8px;">Yoga Teachers: Register / Log in</a>
-        </div>
-        <div class="card petal-card" style="text-align:center;">
-          <h3 style="font-size:1.15rem">Physiotherapy</h3>
-          <p>For certified physiotherapists: publish clinic timings and home-visit slots.</p>
-          <a href="care/#/physio" class="btn btn-primary" style="margin-top:8px;">Physiotherapists: Register / Log in</a>
-        </div>
-      </div>
-      <p style="text-align:center;margin-top:26px;"><strong>Looking for a yoga class or physiotherapist near you?</strong><br>
-        <a href="care/#/join" class="btn btn-primary" style="margin-top:10px;">Patients &amp; Yoga Seekers: Register to find care</a></p>
+
+      <p class="care-login">Already registered? <a href="care/#/login">Log in</a></p>
+      <p class="care-note">Every teacher&rsquo;s and physiotherapist&rsquo;s certificate is reviewed by our team before they are listed. Online appointment booking opens soon.</p>
     </div>
   </section>
 
