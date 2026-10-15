@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" role="img" aria-label="A yoga teacher with a mat walking to a family home nearby">
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffeccc"/><stop offset="1" stop-color="#fbd9a3"/></linearGradient></defs>
+  <rect width="400" height="240" fill="url(#bg)"/>
+  <circle cx="338" cy="52" r="26" fill="#fff3bf"/>
+  <rect y="190" width="400" height="50" fill="#9cc48a"/>
+  <path d="M0 190 Q120 176 220 192 T400 188 V196 H0Z" fill="#86b074"/>
+  <path d="M138 240 Q170 206 250 196" stroke="#f6e3c0" stroke-width="22" fill="none" stroke-linecap="round" opacity=".9"/>
+  <!-- trees -->
+  <g><rect x="22" y="150" width="7" height="44" rx="3" fill="#6b4a2b"/><circle cx="26" cy="140" r="26" fill="#5f8f4a"/><circle cx="14" cy="152" r="16" fill="#76a15d"/></g>
+  <!-- house -->
+  <rect x="64" y="108" width="140" height="88" rx="6" fill="#fffaf0"/>
+  <path d="M50 114 L134 46 L218 114Z" fill="#e07a1f"/>
+  <rect x="104" y="146" width="42" height="50" rx="21" fill="#0e4d4a"/><circle cx="138" cy="172" r="2.6" fill="#f2c14e"/>
+  <rect x="76" y="122" width="22" height="22" rx="4" fill="#ffd978"/><rect x="170" y="122" width="22" height="22" rx="4" fill="#ffd978"/>
+  <path d="M134 36 c-11 -10 -25 -2 -18 10 c5 8 18 16 18 16 s13 -8 18 -16 c7 -12 -7 -20 -18 -10z" fill="#e4436b"/>
+  <!-- family in doorway -->
+  <rect x="116" y="164" width="9" height="32" rx="4" fill="#2b3a42"/><rect x="128" y="164" width="9" height="32" rx="4" fill="#2b3a42"/>
+  <rect x="113" y="134" width="28" height="38" rx="12" fill="#e4436b"/><circle cx="127" cy="124" r="10.5" fill="#cf9468"/><path d="M116 122 a11 11 0 0 1 22 0 q-11 -7 -22 0Z" fill="#2b2118"/>
+  <path d="M140 142 L156 128" stroke="#e4436b" stroke-width="8" stroke-linecap="round"/><circle cx="158" cy="125" r="4.5" fill="#cf9468"/>
+  <!-- yoga teacher walking with mat -->
+  <rect x="296" y="164" width="9" height="32" rx="4" fill="#34495e" transform="rotate(8 300 180)"/><rect x="310" y="164" width="9" height="32" rx="4" fill="#34495e" transform="rotate(-10 314 180)"/>
+  <rect x="290" y="128" width="34" height="44" rx="14" fill="#1f7a74"/><circle cx="307" cy="116" r="12" fill="#e2ac80"/><path d="M294 114 a13 13 0 0 1 26 0 q-13 -8 -26 0Z" fill="#2b2118"/><circle cx="307" cy="102" r="6" fill="#2b2118"/>
+  <path d="M288 134 L268 156" stroke="#1f7a74" stroke-width="9" stroke-linecap="round"/>
+  <rect x="268" y="120" width="12" height="62" rx="6" fill="#e07a1f" transform="rotate(14 274 150)"/>
+  <path d="M258 154 q22 -2 36 -30" stroke="#d9741a" stroke-width="0" fill="none"/>
+  <!-- care dots path -->
+  <path d="M252 176 Q216 166 168 178" stroke="#f2a93a" stroke-width="3" stroke-dasharray="2 9" stroke-linecap="round" fill="none"/>
+</svg>

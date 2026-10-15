@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/care-highlight.css">
+<link rel="stylesheet" href="css/refresh.css">
 </head>
 <body>
 
@@ -23,7 +23,8 @@
       <a href="programs.html" class="active">Services</a>
       <a href="gallery.html">Gallery</a>
       <a href="yttc.html">Teacher Training</a>
-      <li><a href="packages-offers.html">Packages &amp; Offers</a></li>
+      <a href="packages-offers.html">Packages &amp; Offers</a>
+      <a href="care/" class="nav-care">Care</a>
       <a href="contact.html">Contact</a>
     </nav>
     <div class="nav-cta">
@@ -60,38 +61,57 @@
 
   <!-- BREATHING POINT CARE -->
   <section id="care" class="care-band" aria-labelledby="care-title">
-    <div class="container care-inner">
-      <p class="care-eyebrow">Breathing Point Care</p>
-      <h2 id="care-title" class="care-tagline"><span>Har Ghar YOG</span></h2>
-      <p class="care-sub">Good health, at every home.</p>
-      <p class="care-objective">The main objective of <strong>Breathing Point Care</strong> is to reach good health at every home, by connecting families with certified yoga teachers and physiotherapists in their own neighbourhood.</p>
+    <div class="container">
+      <div class="care-top">
+        <div class="care-copy">
+          <p class="care-eyebrow">Breathing Point Care</p>
+          <h2 id="care-title" class="care-tagline"><span>Har Ghar YOG</span></h2>
+          <p class="care-sub">Good health, at every home.</p>
+          <p class="care-objective">The main objective of <strong>Breathing Point Care</strong> is to reach good health at every home, by connecting families with certified yoga teachers and physiotherapists in their own neighbourhood.</p>
+        </div>
+        <figure class="care-art">
+          <img src="assets/img/care/care-near-home.svg" alt="A home at the centre with a yoga teacher and a physiotherapist within 6 km" width="560" height="460">
+        </figure>
+      </div>
 
-      <blockquote class="care-vision">
-        <p>&ldquo;Swasth Rahega India, Tab Badhega India&rdquo;</p>
-        <footer>The Prime Minister&rsquo;s vision of a healthy India. It begins with a healthy home.</footer>
-      </blockquote>
+      <div class="care-vision-card">
+        <p class="vision-label">Our Vision</p>
+        <h3 class="vision-title">Swasth Bharat <em>Yatra</em></h3>
+        <p class="vision-text">A journey towards a healthier India, one home at a time. In the spirit of the Prime Minister&rsquo;s vision: <q>Swasth Rahega India, Tab Badhega India.</q></p>
+      </div>
+
+      <h3 class="care-join">Join the journey</h3>
+      <p class="care-join-sub">Choose how you would like to take part.</p>
 
       <div class="care-cards">
-        <article class="care-card is-featured">
-          <span class="care-badge">Start here</span>
-          <span class="care-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M12 17.2c-2.4-1.5-3.4-2.7-3.4-4.1a1.9 1.9 0 0 1 3.4-1.1 1.9 1.9 0 0 1 3.4 1.1c0 1.4-1 2.6-3.4 4.1Z"/></svg></span>
-          <h3>Families, patients &amp; yoga seekers</h3>
-          <p>Find a certified yoga teacher or physiotherapist within 6&nbsp;km of your home, with their timings and fees.</p>
-          <a class="care-btn care-btn-primary" href="care/#/join">Register to find care</a>
+        <article class="care-card">
+          <div class="care-card-art"><img src="assets/img/care/card-yoga.svg" alt="A yoga teacher guiding a calm practice at home" loading="lazy" width="400" height="240"></div>
+          <div class="care-card-body">
+            <span class="care-badge">For Yoga Teachers</span>
+            <h3>Teach yoga near homes</h3>
+            <p>Certified yoga teacher? Publish your group batches and home-visit classes.</p>
+            <a class="care-btn care-btn-yoga" href="care/#/yoga"><span>Register as Yoga Teacher</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          </div>
         </article>
 
         <article class="care-card">
-          <span class="care-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5.5" r="2.2"/><path d="M12 8.5v4.2"/><path d="M5 11.5c2.2 1 4.4 1.5 7 1.5s4.8-.5 7-1.5"/><path d="M7.5 20.5c.6-3 2.2-4.8 4.5-4.8s3.9 1.8 4.5 4.8"/></svg></span>
-          <h3>Yoga teachers</h3>
-          <p>Certified yoga teacher? Publish your group batches and home-visit classes.</p>
-          <a class="care-btn care-btn-outline" href="care/#/yoga">Register as a Yoga Teacher</a>
+          <div class="care-card-art"><img src="assets/img/care/card-physio.svg" alt="A physiotherapist helping a patient with exercises at home" loading="lazy" width="400" height="240"></div>
+          <div class="care-card-body">
+            <span class="care-badge">For Physiotherapists</span>
+            <h3>Bring care to the doorstep</h3>
+            <p>Certified physiotherapist? Publish your clinic and home-visit timings.</p>
+            <a class="care-btn care-btn-physio" href="care/#/physio"><span>Register as Physiotherapist</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          </div>
         </article>
 
         <article class="care-card">
-          <span class="care-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M12 8v8M8 12h8"/></svg></span>
-          <h3>Physiotherapists</h3>
-          <p>Certified physiotherapist? Publish your clinic and home-visit timings.</p>
-          <a class="care-btn care-btn-outline" href="care/#/physio">Register as a Physiotherapist</a>
+          <div class="care-card-art"><img src="assets/img/care/card-family.svg" alt="A yoga teacher with a mat walking to a family home nearby" loading="lazy" width="400" height="240"></div>
+          <div class="care-card-body">
+            <span class="care-badge">For Families &amp; Yoga Seekers</span>
+            <h3>Find care near your home</h3>
+            <p>See certified yoga teachers and physiotherapists within 6&nbsp;km, with their timings and fees.</p>
+            <a class="care-btn care-btn-seeker" href="care/#/join"><span>Register to find care</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          </div>
         </article>
       </div>
 
@@ -515,6 +535,7 @@
           <li><a href="programs.html">Services</a></li>
           <li><a href="gallery.html">Gallery</a></li>
           <li><a href="yttc.html">Teacher Training</a></li>
+          <li><a href="care/">Breathing Point Care</a></li>
           <li><a href="contact.html">Contact</a></li>
         </ul>
       </div>
