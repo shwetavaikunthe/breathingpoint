@@ -147,3 +147,6 @@ a { transition: color .15s ease; }
   .founder-photo { max-width: 340px; margin: 0 auto 10px; }
   .founder-photo::before { inset: 10px -10px -10px 10px; }
 }
+
+/* ===================== Enroll strip (Teacher Training page) ===================== */
+.enroll-strip { text-align: center; padding: 18px 16px; }
