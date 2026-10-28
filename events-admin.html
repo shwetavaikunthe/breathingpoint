@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex"><title>Events admin | Breathing Point</title>
+<style>
+:root{--bg:#fff;--ink:#2a1a1f;--maroon:#5b1a2b;--line:#eadfd8;--card:#fbf6f2}
+@media(prefers-color-scheme:dark){:root{--bg:#1c1215;--ink:#f3e9e4;--maroon:#e8a0b0;--card:#2a1c20;--line:#44323a}}
+*{box-sizing:border-box}body{margin:0;font:16px/1.5 system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:18px;max-width:640px;margin:auto}
+h1{color:var(--maroon);font-size:24px}input,select,textarea,button{width:100%;font:inherit;padding:10px;margin:4px 0 12px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+button{background:var(--maroon);color:#fff;border:0;font-weight:600;cursor:pointer}@media(prefers-color-scheme:dark){button{color:#1c1215}}
+.row{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px;margin:8px 0}.err{color:#c0392b}
+</style></head><body>
+<h1>Events admin</h1>
+<div id="login"><label>Email<input id="le" type="email"></label><label>Password<input id="lp" type="password"></label><button id="lb">Sign in</button></div>
+<div id="app" hidden>
+<h2>Publish an event</h2>
+<label>Type<select id="t"><option value="doctor">Visiting doctor</option><option value="sound_therapy">Sound therapy session</option><option value="chiropractor">Chiropractor session</option></select></label>
+<label>Title<input id="ti"></label><label>Doctor / therapist name<input id="hn"></label>
+<label>Their email (gets registration alerts)<input id="he" type="email"></label>
+<label>Date and time (IST)<input id="d" type="datetime-local"></label>
+<label>Seats (leave blank for unlimited)<input id="c" type="number" min="1"></label>
+<label>Fee in ₹ (0 if free)<input id="f" type="number" min="0" value="0"></label>
+<label>Description<textarea id="ds" rows="3"></textarea></label>
+<div class="err" id="er"></div><button id="pb">Publish event</button>
+<h2>Published events</h2><div id="ls"></div></div>
+<script>
+const SB="https://qxrkzobixudiwtrfjlzg.supabase.co", KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4cmt6b2JpeHVkaXd0cmZqbHpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4NTc3OTEsImV4cCI6MjEwNzQzMzc5MX0.OhlL0LU8QpJiCsBkp4QoGEmjgcs_2SId2O-4dBpU-TE";   // replace
+const $=id=>document.getElementById(id);let tok=null;
+const H=()=>({apikey:KEY,Authorization:"Bearer "+(tok||KEY),"content-type":"application/json",Prefer:"return=representation"});
+$("lb").onclick=async()=>{const r=await fetch(`${SB}/auth/v1/token?grant_type=password`,{method:"POST",headers:{apikey:KEY,"content-type":"application/json"},body:JSON.stringify({email:$("le").value,password:$("lp").value})});
+  const j=await r.json();if(!r.ok)return alert("Sign-in failed");tok=j.access_token;$("login").hidden=true;$("app").hidden=false;list()};
+$("pb").onclick=async()=>{$("er").textContent="";
+  const body={event_type:$("t").value,title:$("ti").value.trim(),host_name:$("hn").value.trim(),host_email:$("he").value.trim(),
+    starts_at:$("d").value?new Date($("d").value+"+05:30").toISOString():null,capacity:$("c").value?+$("c").value:null,fee_inr:+$("f").value||0,description:$("ds").value.trim()};
+  if(!body.title||!body.host_name||!body.host_email||!body.starts_at)return $("er").textContent="Fill title, name, email and date/time";
+  const r=await fetch(`${SB}/rest/v1/events`,{method:"POST",headers:H(),body:JSON.stringify(body)});
+  if(!r.ok)return $("er").textContent="Could not publish. Check you are an events admin.";
+  ["ti","hn","he","d","c","ds"].forEach(i=>$(i).value="");list()};
+async function list(){const [ev,rg]=await Promise.all([
+  fetch(`${SB}/rest/v1/events?order=starts_at.desc&limit=30`,{headers:H()}).then(r=>r.json()),
+  fetch(`${SB}/rest/v1/event_registrations?status=eq.confirmed&select=event_id,name,mobile,email`,{headers:H()}).then(r=>r.json())]);
+  $("ls").innerHTML=ev.map(e=>{const rs=rg.filter(x=>x.event_id===e.id);
+    return `<div class="row"><b>${e.title.replace(/</g,"&lt;")}</b><br>${new Date(e.starts_at).toLocaleString("en-IN",{timeZone:"Asia/Kolkata"})} · ${rs.length} registered
+    <br><button data-u="${e.id}" data-p="${!e.is_published}" style="width:auto;margin:8px 0 0">${e.is_published?"Unpublish":"Publish"}</button></div>`}).join("")}
+$("ls").onclick=async e=>{const id=e.target.dataset.u;if(!id)return;
+  await fetch(`${SB}/rest/v1/events?id=eq.${id}`,{method:"PATCH",headers:H(),body:JSON.stringify({is_published:e.target.dataset.p==="true"})});list()};
+</script></body></html>

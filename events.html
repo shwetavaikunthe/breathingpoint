@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Events | Breathing Point</title>
+<style>
+:root{--bg:#fff;--ink:#2a1a1f;--maroon:#5b1a2b;--saffron:#e8891d;--teal:#0f5c5a;--line:#eadfd8;--card:#fbf6f2}
+@media(prefers-color-scheme:dark){:root{--bg:#1c1215;--ink:#f3e9e4;--maroon:#e8a0b0;--card:#2a1c20;--line:#44323a}}
+*{box-sizing:border-box}body{margin:0;font:16px/1.5 Georgia,serif;background:var(--bg);color:var(--ink)}
+header{padding:28px 18px 8px;max-width:760px;margin:auto}h1{margin:0;color:var(--maroon);font-size:28px}
+main{max-width:760px;margin:auto;padding:8px 18px 60px}
+.ev{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--saffron);border-radius:10px;padding:14px 16px;margin:14px 0}
+.ev.sound_therapy{border-left-color:var(--teal)}.ev.chiropractor{border-left-color:var(--maroon)}
+.ev h2{margin:0 0 2px;font-size:19px}.meta{font:14px system-ui,sans-serif;opacity:.8}
+button{font:600 15px system-ui,sans-serif;background:var(--maroon);color:#fff;border:0;border-radius:8px;padding:10px 16px;cursor:pointer}
+@media(prefers-color-scheme:dark){button{color:#1c1215}}
+button:focus-visible,input:focus-visible{outline:3px solid var(--saffron);outline-offset:2px}
+dialog{border:1px solid var(--line);border-radius:12px;max-width:380px;width:92%;background:var(--bg);color:var(--ink)}
+input{width:100%;padding:10px;margin:6px 0 12px;font:16px system-ui,sans-serif;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+label{font:14px system-ui,sans-serif}.err{color:#c0392b;font:14px system-ui,sans-serif;min-height:20px}
+.ok{color:var(--teal);font:600 16px system-ui,sans-serif}
+</style></head><body>
+<header><h1>Events at Breathing Point</h1><p class="meta">Visiting doctors, sound therapy and chiropractor sessions. Register with your email OTP.</p></header>
+<main id="list"><p class="meta">Loading events…</p></main>
+
+<dialog id="dlg"><div id="step1">
+<h3 id="dt" style="margin-top:0"></h3>
+<label>Full name<input id="n" autocomplete="name"></label>
+<label>Email<input id="e" type="email" autocomplete="email"></label>
+<label>Mobile number<input id="m" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel-national"></label>
+<div class="err" id="err1"></div><button id="send">Send OTP</button> <button id="x1" style="background:none;color:var(--ink)">Cancel</button></div>
+<div id="step2" hidden><h3 style="margin-top:0">Enter OTP</h3><p class="meta">We emailed a 6-digit code to <span id="em"></span>.</p>
+<input id="o" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
+<div class="err" id="err2"></div><button id="ver">Confirm registration</button> <button id="back" style="background:none;color:var(--ink)">Change details</button></div>
+<div id="step3" hidden><p class="ok">You are registered. A confirmation is on its way to your email.</p><button id="x3">Close</button></div></dialog>
+
+<script>
+const SB="https://qxrkzobixudiwtrfjlzg.supabase.co", KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4cmt6b2JpeHVkaXd0cmZqbHpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4NTc3OTEsImV4cCI6MjEwNzQzMzc5MX0.OhlL0LU8QpJiCsBkp4QoGEmjgcs_2SId2O-4dBpU-TE";   // replace
+const H={apikey:KEY,Authorization:"Bearer "+KEY,"content-type":"application/json"};
+const LABEL={doctor:"Visiting doctor",sound_therapy:"Sound therapy",chiropractor:"Chiropractor"};
+const $=id=>document.getElementById(id);let cur=null;
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt=d=>new Date(d).toLocaleString("en-IN",{timeZone:"Asia/Kolkata",dateStyle:"full",timeStyle:"short"});
+async function load(){
+  try{
+    const now=new Date().toISOString();
+    const [ev,seats]=await Promise.all([
+      fetch(`${SB}/rest/v1/events?is_published=eq.true&starts_at=gte.${now}&order=starts_at.asc`,{headers:H}).then(r=>r.json()),
+      fetch(`${SB}/rest/v1/event_seats`,{headers:H}).then(r=>r.json())]);
+    const used=Object.fromEntries(seats.map(s=>[s.event_id,s.confirmed]));
+    window.EV=Object.fromEntries(ev.map(e=>[e.id,e]));
+    $("list").innerHTML=ev.length?ev.map(e=>{const full=e.capacity&&(used[e.id]||0)>=e.capacity;
+      return `<article class="ev ${e.event_type}"><h2>${esc(e.title)}</h2>
+      <div class="meta">${LABEL[e.event_type]} with ${esc(e.host_name)}<br>${fmt(e.starts_at)}<br>${esc(e.venue)}${e.fee_inr?` · ₹${e.fee_inr}`:""}</div>
+      ${e.description?`<p>${esc(e.description)}</p>`:""}
+      ${full?'<p class="meta"><b>Event full</b></p>':`<button data-id="${e.id}">Register</button>`}</article>`}).join(""):
+      '<p class="meta">No upcoming events right now. Please check back soon.</p>';
+  }catch{ $("list").innerHTML='<p class="err">Could not load events. Please refresh.</p>'}
+}
+$("list").onclick=e=>{const id=e.target.dataset.id;if(!id)return;cur=id;
+  $("dt").textContent=EV[id].title;["step2","step3"].forEach(s=>$(s).hidden=true);$("step1").hidden=false;
+  $("err1").textContent=$("err2").textContent="";$("dlg").showModal()};
+async function call(body){const r=await fetch(`${SB}/functions/v1/event-register`,{method:"POST",headers:H,body:JSON.stringify({event_id:cur,...body})});
+  const j=await r.json();if(!r.ok)throw new Error(j.error||"Something went wrong");return j}
+$("send").onclick=async()=>{$("err1").textContent="";$("send").disabled=true;
+  try{await call({action:"request",name:$("n").value,email:$("e").value,mobile:$("m").value});
+    $("em").textContent=$("e").value;$("step1").hidden=true;$("step2").hidden=false;$("o").focus()}
+  catch(x){$("err1").textContent=x.message}$("send").disabled=false};
+$("ver").onclick=async()=>{$("err2").textContent="";$("ver").disabled=true;
+  try{await call({action:"verify",email:$("e").value,otp:$("o").value});$("step2").hidden=true;$("step3").hidden=false;load()}
+  catch(x){$("err2").textContent=x.message}$("ver").disabled=false};
+$("back").onclick=()=>{$("step2").hidden=true;$("step1").hidden=false};
+["x1","x3"].forEach(i=>$(i).onclick=()=>$("dlg").close());
+load();
+</script></body></html>
